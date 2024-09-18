@@ -1,0 +1,36 @@
+{
+  "name": "xrd-simulation",
+  "version": "0.0.1",
+  "description": "A simulation system for XRD used in molecular sieve teaching experiments",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Hofmann8/XRD-simulation.git"
+  },
+  "keywords": [
+    "Electron",
+    "XRD",
+    "simulation",
+    "molecular sieve",
+    "teaching",
+    "experiment"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^32.1.0",
+    "electron-builder": "^25.0.5"
+  },
+  "build": {
+    "appId": "com.hofmann8.xrdsimulation",
+    "productName": "XRD Simulation",
+    "win": {
+      "target": "nsis",
+      "icon": "icon.ico"
+    }
+  }
+}
