@@ -16,3 +16,12 @@ window.addEventListener('DOMContentLoaded', () => {
     replaceText(`${type}-version`, process.versions[type])
   }
 })
+
+const { contextBridge, ipcRenderer } = require('electron');
+
+// 确保暴露的 API 正确
+contextBridge.exposeInMainWorld('electronAPI', {
+    findClosestXRD: (data) => ipcRenderer.invoke('findClosestXRD', data),
+    receiveError: (callback) => ipcRenderer.on('error', callback)
+});
+

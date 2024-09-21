@@ -1,19 +1,82 @@
 <!DOCTYPE html>
-<html>
-  <head>
+<html lang="zh">
+<head>
     <meta charset="UTF-8">
-    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'">
-    <link href="./styles.css" rel="stylesheet">
-    <title>Hello World!</title>
-  </head>
-  <body>
-    <h1>Hello World!</h1>
-    We are using Node.js <span id="node-version"></span>,
-    Chromium <span id="chrome-version"></span>,
-    and Electron <span id="electron-version"></span>.
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SimXRD-DUT</title>
 
-    <!-- You can also require other files to run in this process -->
-    <script src="./renderer.js"></script>
-  </body>
+    <!-- 引入 Bootstrap 和 Animate.css -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+    <!-- 引入自定义 CSS 文件 -->
+    <link rel="stylesheet" href="renderer/style.css">
+
+    <!-- Google Font 引用 -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet">
+
+    <!-- favicon 设置 -->
+    <link rel="icon" href="XRD_logo.png" type="image/png">
+</head>
+<body>
+    <div class="container mt-5">
+        <!-- 大标题使用渐变和扫光动画效果 -->
+        <div class="text-center">
+            <div class="logo-text sweep-effect">
+                Sim<span class="gradient-x">X</span>RD-DUT
+            </div>
+        </div>
+
+        <form id="xrd-form" class="row g-3 mt-4">
+            <div class="col-md-6">
+                <label for="sio2" class="form-label">SiO2/Al2O3 比例:</label>
+                <input type="number" class="form-control" id="sio2" value="3" required>
+            </div>
+
+            <div class="col-md-6">
+                <label for="na2o" class="form-label">Na2O/SiO2 比例:</label>
+                <input type="number" class="form-control" id="na2o" value="2" required>
+            </div>
+
+            <div class="col-md-6">
+                <label for="h2o" class="form-label">H2O/SiO2 比例:</label>
+                <input type="number" class="form-control" id="h2o" value="10" required>
+            </div>
+
+            <div class="col-md-6">
+                <label for="time" class="form-label">时间 (小时):</label>
+                <input type="number" class="form-control" id="time" value="3" required>
+            </div>
+
+            <div class="col-md-6">
+                <label for="temperature" class="form-label">温度 (℃):</label>
+                <input type="number" class="form-control" id="temperature" value="90" required>
+            </div>
+
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary w-100">开始模拟</button>
+            </div>
+        </form>
+
+        <div id="loading-spinner" class="spinner-border text-primary mt-4" role="status" style="display:none;">
+            <span class="visually-hidden">加载中...</span>
+        </div>
+
+        <div class="mt-4">
+            <h3 class="animate__animated animate__fadeInUp">最近似结果</h3>
+            <div class="card shadow-lg p-3 mb-5 bg-white rounded animate__animated animate__fadeIn" style="display:none;" id="result-card">
+                <div class="card-body">
+                    <img id="xrd-image" class="img-fluid mb-3" style="display:none;">
+                    <p id="source-info" class="card-text"></p>
+                    <p id="closest-data" class="card-text"></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="alert alert-danger mt-4" id="error-message" style="display:none;"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="renderer/app.js"></script>
+</body>
 </html>
