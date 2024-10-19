@@ -5,10 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SimXRD-DUT</title>
 
-    <!-- 引入 Bootstrap 和 Animate.css -->
+    <!-- 引入 Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-
+    
     <!-- 引入自定义 CSS 文件 -->
     <link rel="stylesheet" href="renderer/style.css">
 
@@ -20,12 +19,12 @@
 </head>
 <body>
     <div class="container mt-5">
-        <!-- 大标题使用渐变和扫光动画效果 -->
+        <!-- 标题 -->
         <div class="text-center">
-            <div class="logo-text sweep-effect">
+            <div class="logo-text sweep-effect animate__animated animate__fadeInDown">
                 Sim<span class="gradient-x">X</span>RD-DUT
             </div>
-        </div>
+        </div>        
 
         <form id="xrd-form" class="row g-3 mt-4">
             <div class="col-md-6">
@@ -63,10 +62,13 @@
         </div>
 
         <div class="mt-4">
-            <h3 class="animate__animated animate__fadeInUp">最近似结果</h3>
-            <div class="card shadow-lg p-3 mb-5 bg-white rounded animate__animated animate__fadeIn" style="display:none;" id="result-card">
+            <h3>最近似结果</h3>
+            <div class="card shadow-lg p-3 mb-5 bg-white rounded" id="result-card">
                 <div class="card-body">
-                    <img id="xrd-image" class="img-fluid mb-3" style="display:none;">
+                    <!-- ECharts 容器，未绘制时显示占位符 -->
+                    <div id="xrd-chart" class="chart-container">
+                        <p class="text-center text-muted placeholder-text">图表加载后显示结果</p>
+                    </div>
                     <p id="source-info" class="card-text"></p>
                     <p id="closest-data" class="card-text"></p>
                 </div>
@@ -76,7 +78,9 @@
         <div class="alert alert-danger mt-4" id="error-message" style="display:none;"></div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- ECharts 引入 -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+    <!-- 引入自定义 JS 文件 -->
     <script src="renderer/app.js"></script>
 </body>
 </html>

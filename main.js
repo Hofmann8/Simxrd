@@ -80,66 +80,89 @@ app.on('will-quit', () => {
     globalShortcut.unregisterAll();
   });
 
-ipcMain.handle('findClosestXRD', (event, inputData) => {
-    console.log("Received input data:", inputData);  // 输出收到的输入数据
 
-    if (!inputData.sio2 || !inputData.na2o || !inputData.h2o || !inputData.time || !inputData.temperature) {
-        const errorMessage = "Please fill in all required fields.";
-        console.error(errorMessage, inputData);  // 输出未提供的值
-        sendErrorToRenderer(errorMessage);
-        return {
-            img: path.join(__dirname, 'xrd_images', 'error.png'),
-            source: errorMessage,
-            result: "Incomplete input"
-        };
-    }
-
-    let closestData;
-    try {
-        closestData = dataSource.reduce((prev, curr) => {
-            const prevDistance = Math.sqrt(
-                Math.pow(prev.sio2 - inputData.sio2, 2) +
-                Math.pow(prev.na2o - inputData.na2o, 2) +
-                Math.pow(prev.h2o - inputData.h2o, 2) +
-                Math.pow(prev.time - inputData.time, 2) +
-                Math.pow(prev.temperature - inputData.temperature, 2)
-            );
-            const currDistance = Math.sqrt(
-                Math.pow(curr.sio2 - inputData.sio2, 2) +
-                Math.pow(curr.na2o - inputData.na2o, 2) +
-                Math.pow(curr.h2o - inputData.h2o, 2) +
-                Math.pow(curr.time - inputData.time, 2) +
-                Math.pow(curr.temperature - inputData.temperature, 2)
-            );
-            console.log(`Comparing distances: prev=${prevDistance}, curr=${currDistance}`);  // 输出每次的距离比较
-            return currDistance < prevDistance ? curr : prev;
-        });
-
-        if (!closestData) {
-            throw new Error("No closest data found.");
-        }
-        console.log("Found closest data:", closestData);  // 输出找到的最近似数据
-    } catch (error) {
-        const errorMessage = `Error during data matching: ${error.message}`;
-        console.error(errorMessage);
-        sendErrorToRenderer(errorMessage);  // 将错误发送到前端
-        return {
-            img: path.join(__dirname, 'xrd_images', 'error.png'),
-            source: errorMessage,
-            result: "No match found"
-        };
-    }
-
-    // 返回所有找到的最近似结果数据
-    return {
-        img: path.join(__dirname, 'xrd_images', closestData.img),
-        source: closestData.source,
-        result: closestData.result,
-        sio2: closestData.sio2,  // 返回最近似数据
-        na2o: closestData.na2o,
-        h2o: closestData.h2o,
-        time: closestData.time,
-        temperature: closestData.temperature
-    };
-});
+  
+  ipcMain.handle('findClosestXRD', (event, inputData) => {
+      console.log("Received input data:", inputData);  // 输出收到的输入数据
+  
+      if (!inputData.sio2 || !inputData.na2o || !inputData.h2o || !inputData.time || !inputData.temperature) {
+          const errorMessage = "Please fill in all required fields.";
+          console.error(errorMessage, inputData);  // 输出未提供的值
+          sendErrorToRenderer(errorMessage);
+          return {
+              img: path.join(__dirname, 'xrd_images', 'error.png'),
+              source: errorMessage,
+              result: "Incomplete input"
+          };
+      }
+  
+      let closestData;
+      try {
+          closestData = dataSource.reduce((prev, curr) => {
+              const prevDistance = Math.sqrt(
+                  Math.pow(prev.sio2 - inputData.sio2, 2) +
+                  Math.pow(prev.na2o - inputData.na2o, 2) +
+                  Math.pow(prev.h2o - inputData.h2o, 2) +
+                  Math.pow(prev.time - inputData.time, 2) +
+                  Math.pow(prev.temperature - inputData.temperature, 2)
+              );
+              const currDistance = Math.sqrt(
+                  Math.pow(curr.sio2 - inputData.sio2, 2) +
+                  Math.pow(curr.na2o - inputData.na2o, 2) +
+                  Math.pow(curr.h2o - inputData.h2o, 2) +
+                  Math.pow(curr.time - inputData.time, 2) +
+                  Math.pow(curr.temperature - inputData.temperature, 2)
+              );
+              console.log(`Comparing distances: prev=${prevDistance}, curr=${currDistance}`);  // 输出每次的距离比较
+              return currDistance < prevDistance ? curr : prev;
+          });
+  
+          if (!closestData) {
+              throw new Error("No closest data found.");
+          }
+          console.log("Found closest data:", closestData);  // 输出找到的最近似数据
+      } catch (error) {
+          const errorMessage = `Error during data matching: ${error.message}`;
+          console.error(errorMessage);
+          sendErrorToRenderer(errorMessage);  // 将错误发送到前端
+          return {
+              img: path.join(__dirname, 'xrd_images', 'error.png'),
+              source: errorMessage,
+              result: "No match found"
+          };
+      }
+  
+      // 使用 source 字段来查找对应的 JSON 文件并读取内容
+      const jsonFilePath = path.join(__dirname, 'xrd_data', `${closestData.source}.json`);
+      let jsonData;
+      try {
+          console.log('Loading XRD data from file:', jsonFilePath);  // 输出加载的文件路径
+          const fileContent = fs.readFileSync(jsonFilePath, 'utf8');
+          jsonData = JSON.parse(fileContent);
+          console.log('XRD data loaded successfully:', jsonData);  // 输出加载的 JSON 数据
+      } catch (error) {
+          const errorMessage = `Error loading XRD data from file: ${error.message}`;
+          console.error(errorMessage);
+          sendErrorToRenderer(errorMessage);  // 将错误发送到前端
+          return {
+              img: path.join(__dirname, 'xrd_images', 'error.png'),
+              source: `Error loading XRD data from file: ${closestData.source}`,
+              result: "Data loading error"
+          };
+      }
+  
+      // 返回所有找到的最近似结果数据，包括从 JSON 文件中加载的 XRD 数据
+      return {
+          img: path.join(__dirname, 'xrd_images', closestData.img),
+          source: closestData.source,
+          result: closestData.result,
+          sio2: closestData.sio2,  // 返回最近似数据
+          na2o: closestData.na2o,
+          h2o: closestData.h2o,
+          time: closestData.time,
+          temperature: closestData.temperature,
+          data: jsonData  // 添加从文件中加载的 JSON 数据
+      };
+  });
+  
 
