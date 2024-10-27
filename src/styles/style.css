@@ -1,0 +1,165 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+label {
+    display: block;
+    margin: 10px 0 5px;
+}
+
+input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+#chart-container {
+    margin-top: 20px;
+}
+
+#source-info {
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+#xrd-image {
+    max-width: 100%;      /* 设置图片的最大宽度，保持响应式 */
+    max-height: 500px;    /* 限制图片的最大高度 */
+    display: block;       /* 将图片设置为块级元素，方便布局 */
+    margin: 20px auto;    /* 将图片水平居中 */
+}
+
+.card {
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+/* 标题基础样式 */
+.logo-text {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 700;
+    font-size: 36px;
+    color: #003366;
+    letter-spacing: 2px;
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+}
+
+/* X 字母的亮蓝色渐变 */
+.gradient-x {
+    background: linear-gradient(90deg, #00ccff, #66ffff); /* 亮蓝色渐变 */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 44px;
+    margin-left: 4px;
+}
+
+/* 扫光效果的动画 */
+@keyframes sweep {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+.sweep-effect::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 150%;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.4) 50%, rgba(255, 255, 255, 0.1) 100%);
+    animation: sweep 3s infinite;
+    transform: skewX(-20deg);
+}
+
+.chart-container {
+    width: 100%;
+    height: 400px;
+    position: relative;
+    border: 1px solid #ccc; /* 增加边框让图表区域更明显 */
+    background-color: #f8f9fa;
+}
+
+.placeholder-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.2rem;
+    color: #aaa;
+    text-align: center;
+}
+
+/* 图表容器大小 */
+#xrd-chart {
+    width: 100%;
+    height: 400px;
+}
+
+/* 缩小工具栏按钮并放置在图表右下角 */
+#toggle-toolbar {
+    z-index: 10; /* 确保按钮位于最前面 */
+    width: 40px;
+    height: 40px;
+    padding: 5px;
+    font-size: 18px;
+}
+
+/* 工具栏位置在按钮上方，并且缩小 */
+#tool-bar-container {
+    z-index: 9; /* 确保工具栏显示时位于图表上方 */
+    width: 150px;
+    padding: 10px;
+}
+
+/* 工具栏内容缩小 */
+.tool-bar {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 工具栏标题和按钮尺寸缩小 */
+.tool-bar h6 {
+    font-size: 12px;
+}
+
+.tool-bar button {
+    font-size: 12px;
+    padding: 5px;
+}
+
+
