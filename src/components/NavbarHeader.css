@@ -1,0 +1,91 @@
+/* NavbarHeader 样式 */
+.navbar-header {
+    padding-top: 20px;
+    text-align: center;
+    width: 100%;
+    height: auto; /* 高度适应内容 */
+    min-height: 80px; /* 确保收起状态下有足够的最小高度 */
+    position: relative;
+    display: flex;
+    align-items: center; /* 垂直居中 */
+    justify-content: center; /* 水平居中 */
+}
+
+.navbar-logo {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 700;
+    color: #003366;
+    letter-spacing: 2px;
+    display: inline-block;
+    overflow: hidden;
+    text-align: center;
+    width: 100%; /* 在父容器内自适应宽度 */
+    height: 100px; /* 在父容器内自适应高度 */
+    position: relative;
+}
+
+/* 收起状态下的 XRD 小字体 */
+.logo-text {
+    font-size: 16px;
+    opacity: 1;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* 完全居中 */
+    transition: opacity 0.3s ease;
+    z-index: 2; /* 确保显示在顶部 */
+}
+
+/* 展开状态下显示 SimXRD-DUT */
+.hover-full-title {
+    font-size: 28px;
+    line-height: 1.2;
+    color: #003366;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* 完全居中 */
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 2; /* 确保显示在顶部 */
+}
+
+/* 鼠标悬停整个 Navbar 时切换显示 */
+.navbar:hover .logo-text {
+    opacity: 0; /* 隐藏小字体的 XRD */
+}
+
+.navbar:hover .hover-full-title {
+    opacity: 1; /* 显示完整标题 */
+}
+
+/* X 字母的亮蓝色渐变 */
+.gradient-x {
+    background: linear-gradient(90deg, #00ccff, #66ffff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 36px;
+    margin-left: 2px;
+}
+
+/* 扫光效果 */
+.sweep-effect::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 150%;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.4) 50%, rgba(255, 255, 255, 0.1) 100%);
+    animation: sweep 3s infinite;
+    transform: skewX(-20deg);
+}
+
+@keyframes sweep {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
+}

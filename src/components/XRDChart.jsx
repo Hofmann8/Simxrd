@@ -114,28 +114,6 @@ const XRDChart = ({ data, speed, instantGenerate }) => {
     return () => clearAnimationTimeout();
   }, [data, speed, instantGenerate, isInstantRender]);
 
-  // 添加 hover 时显示的虚线竖线
-  useEffect(() => {
-    const handleMouseHover = (params) => {
-      if (params.componentType === 'series') {
-        const xCoord = params.value[0]; // 获取鼠标所在的 x 坐标
-        chartRef.current.setOption({
-          series: [{
-            markLine: {
-              data: [{ xAxis: xCoord }]
-            }
-          }]
-        });
-      }
-    };
-
-    chartRef.current.on('mouseover', handleMouseHover);
-
-    return () => {
-      chartRef.current.off('mouseover', handleMouseHover);
-    };
-  }, []);
-
   return <div id="xrd-chart" style={{ width: '100%', height: '400px', minHeight: '400px' }} />;
 };
 

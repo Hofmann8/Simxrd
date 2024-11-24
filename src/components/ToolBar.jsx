@@ -7,8 +7,21 @@ const ToolBar = ({ onSpeedChange, currentSpeed, onGenerate }) => {
   };
 
   return (
-    <div className="tool-bar bg-light p-2 rounded position-absolute" style={{ bottom: '20px', right: '20px', width: '150px' }}>
-      <button className="btn btn-success w-100 mb-2" onClick={onGenerate}>一键生成</button>
+    <div
+      className="tool-bar bg-light p-2 rounded position-absolute"
+      style={{
+        top: '40px',
+        right: '20px',
+        width: '150px',
+        opacity: 0.9, // 增加透明度
+        boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
+        transformOrigin: 'top right', // 设置展开动画起点
+        transition: 'all 0.3s ease', // 添加平滑的展开动画
+      }}
+    >
+      <button className="btn btn-success w-100 mb-2" onClick={onGenerate}>
+        一键生成
+      </button>
       <div className="speed-control">
         <label htmlFor="speed-range">加速倍率: {currentSpeed}x</label>
         <input
