@@ -10,7 +10,8 @@
     "3dmol": "^2.4.0",
     "axios": "^1.6.8",
     "bootstrap": "^5.3.3",
-    "echarts": "^5.5.1",
+    "echarts": "^5.4.3",
+    "echarts-for-react": "^3.0.2",
     "highlight.js": "^11.9.0",
     "punycode": "^2.3.1",
     "react": "^17.0.2",
@@ -27,12 +28,13 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "serve": "serve -s build",
     "test": "react-scripts test",
     "lint": "eslint src --ext .js,.jsx,.ts,.tsx",
     "coverage": "npm run test -- --watchAll=false --coverage",
     "electron:dev": "electron . dev",
-    "electron": "electron . dev"
+    "electron": "electron . dev",
+    "build:wasm": "cd wasm/xrd_core && compile.bat",
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
@@ -56,7 +58,8 @@
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@testing-library/react": "^12.1.5",
     "electron": "^33.0.1",
-    "electron-devtools-installer": "^3.2.0"
+    "electron-devtools-installer": "^3.2.0",
+    "react-app-rewired": "^2.2.1"
   },
   "jest": {
     "transform": {

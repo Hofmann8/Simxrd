@@ -39,3 +39,73 @@
     transition: opacity 300ms ease, transform 300ms ease;
   }
   
+.result-card {
+  transition: all 0.3s ease;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.result-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.tool-bar {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 200px;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.form-range::-webkit-slider-thumb {
+  background: #007bff;
+}
+
+.form-range::-webkit-slider-runnable-track {
+  background: #e9ecef;
+}
+
+/* 添加图表容器的样式 */
+.chart-container {
+  position: relative;
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+/* 添加动画效果 */
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.toolbar-enter {
+  opacity: 0;
+  max-height: 0;
+}
+
+.toolbar-enter-active {
+  opacity: 1;
+  max-height: 200px;
+  transition: all 300ms ease-in;
+}
+
+.toolbar-exit {
+  opacity: 1;
+  max-height: 200px;
+}
+
+.toolbar-exit-active {
+  opacity: 0;
+  max-height: 0;
+  transition: all 300ms ease-out;
+}
+  

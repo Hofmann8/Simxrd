@@ -97,3 +97,68 @@
 .navbar li.active a {
     color: #007bff;
 }
+
+/* 版权信息相关样式 */
+.navbar-footer {
+    width: 100%;
+    padding: 10px 5px;
+    margin-top: auto;
+    border-top: 1px solid #eee;
+    background-color: rgba(248, 249, 250, 0.9);
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.copyright-info {
+    text-align: center;
+    font-size: 11px;
+    color: #666;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.copyright-text {
+    margin: 0;
+    padding: 0;
+    line-height: 1.2;
+}
+
+/* 收起状态的样式 */
+.copyright-year {
+    display: block;
+}
+
+.copyright-name {
+    display: block;
+    font-size: 10px;
+}
+
+.license-text {
+    display: none;
+    margin: 3px 0 0 0;
+    font-size: 10px;
+    color: #888;
+}
+
+/* 展开状态的样式 */
+.navbar:hover .copyright-year,
+.navbar:hover .copyright-name {
+    display: inline;
+    font-size: 11px;
+}
+
+.navbar:hover .copyright-break {
+    display: none;
+}
+
+.navbar:hover .license-text {
+    display: block;
+}
+
+/* 删除不需要的样式 */
+.data-source,
+.navbar:hover .data-source {
+    display: none;
+}

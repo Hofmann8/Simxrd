@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { FaFlask, FaThermometerHalf, FaClock } from 'react-icons/fa';
+import { FaInfoCircle } from 'react-icons/fa';
+import { formFields } from '../config/formConfig';
 
-const XRDForm = ({ onSubmit }) => {
+const XRDForm = ({ onSubmit, suggestions }) => {
   const [formData, setFormData] = useState({
     sio2: 3,
     na2o: 2,
@@ -15,65 +16,76 @@ const XRDForm = ({ onSubmit }) => {
     setFormData((prevData) => ({ ...prevData, [id]: Number(value) }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSubmit(formData);
-  };
-
-  const iconStyle = { color: '#007bff', marginRight: '5px' }; // 蓝色图标，右侧间距
-
-  const labels = {
-    sio2: (
-      <>
-        <FaFlask style={iconStyle} />
-        SiO<sub>2</sub>/Al<sub>2</sub>O<sub>3</sub> 比例
-      </>
-    ),
-    na2o: (
-      <>
-        <FaFlask style={iconStyle} />
-        Na<sub>2</sub>O/SiO<sub>2</sub> 比例
-      </>
-    ),
-    h2o: (
-      <>
-        <FaFlask style={iconStyle} />
-        H<sub>2</sub>O/SiO<sub>2</sub> 比例
-      </>
-    ),
-    time: (
-      <>
-        <FaClock style={iconStyle} />
-        时间 (小时)
-      </>
-    ),
-    temperature: (
-      <>
-        <FaThermometerHalf style={iconStyle} />
-        温度 (℃)
-      </>
-    ),
-  };
-
   return (
-    <form onSubmit={handleSubmit} className="row g-3 mt-4 bg-light p-4 rounded">
-      {Object.keys(formData).map((key, idx) => (
-        <div key={idx} className="col-md-6">
-          <label htmlFor={key} className="form-label">
-            {labels[key] || key.toUpperCase()}
-          </label>
-          <input
-            type="number"
-            className="form-control"
-            id={key}
-            value={formData[key]}
-            onChange={handleChange}
-            required
-          />
-        </div>
-      ))}
-      <div className="col-12">
-        <button type="submit" className="btn btn-primary w-100">
+    <form onSubmit={(e) => {
+      e.preventDefault();
+      onSubmit(formData);
+    }}>
+      <h2 className="text-center mb-4">实验参数设置</h2>
+      <div className="row g-4">
+        {Object.entries(formFields).map(([key, field]) => (
+          <div key={key} className="col-md-6">
+            <div className="form-group">
+              <label className="d-flex align-items-center mb-2">
+                <span className="me-2">{field.icon}</span>
+                {field.label}
+                <span 
+                  className="ms-2"
+                  style={{ cursor: 'help' }}
+                  title={field.tooltip}
+                >
+                  <FaInfoCircle size={14} />
+                </span>
+              </label>
+              <div className="input-group">
+                <input
+                  type="number"
+                  className="form-control text-end"
+                  id={key}
+                  value={formData[key]}
+                  onChange={handleChange}
+                  min={field.min}
+                  max={field.max}
+                  step={field.step}
+                  required
+                  style={{ width: '100px' }}
+                />
+              </div>
+              <div className="position-relative mt-2">
+                {suggestions && suggestions[key] && (
+                  <div 
+                    className="suggestion-range"
+                    style={{
+                      position: 'absolute',
+                      left: `${(suggestions[key].min - field.min) / (field.max - field.min) * 100}%`,
+                      width: `${(suggestions[key].max - suggestions[key].min) / (field.max - field.min) * 100}%`,
+                      height: '10px',
+                      backgroundColor: 'rgba(255, 193, 7, 0.3)',
+                      borderRadius: '5px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      zIndex: 1
+                    }}
+                  />
+                )}
+                <input
+                  type="range"
+                  className="form-range"
+                  min={field.min}
+                  max={field.max}
+                  step={field.step}
+                  value={formData[key]}
+                  onChange={handleChange}
+                  id={key}
+                  style={{ position: 'relative', zIndex: 2 }}
+                />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="text-center mt-4">
+        <button type="submit" className="btn btn-primary px-5">
           开始模拟
         </button>
       </div>

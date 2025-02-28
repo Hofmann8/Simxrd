@@ -1,0 +1,15 @@
+.form-range {
+    height: 10px;
+    padding: 0;
+    background: transparent;
+}
+
+.form-range::-webkit-slider-thumb {
+    position: relative;
+    z-index: 3;
+}
+
+.suggestion-range {
+    pointer-events: none;
+    box-shadow: 0 0 4px rgba(255, 193, 7, 0.5);
+}

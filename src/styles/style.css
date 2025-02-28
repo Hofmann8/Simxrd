@@ -105,3 +105,117 @@ button:hover {
     transition: transform 300ms ease, opacity 300ms ease;
   }
   
+/* 自定义滚动条样式 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+  /* 添加周期表背景图案 */
+  background-image: linear-gradient(
+    45deg,
+    rgba(0, 123, 255, 0.05) 25%,
+    transparent 25%,
+    transparent 75%,
+    rgba(0, 123, 255, 0.05) 75%
+  );
+  background-size: 20px 20px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    to bottom,
+    #007bff,
+    #00a0ff
+  );
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+  /* 添加化学元素符号装饰 */
+  position: relative;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    to bottom,
+    #0056b3,
+    #007bff
+  );
+}
+
+/* 添加化学元素装饰 */
+.chemical-scrollbar-decoration {
+  position: fixed;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0.5;
+}
+
+.chemical-element {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 12px;
+  color: #007bff;
+  border: 1px solid rgba(0, 123, 255, 0.2);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+/* 滚动条出现时的动画效果 */
+@keyframes fadeInScrollbar {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* 当有滚动条时显示化学元素装饰 */
+.has-scrollbar .chemical-scrollbar-decoration {
+  animation: fadeInScrollbar 0.3s ease forwards;
+}
+
+/* 适配暗色模式 */
+@media (prefers-color-scheme: dark) {
+  ::-webkit-scrollbar-track {
+    background: #2a2a2a;
+    background-image: linear-gradient(
+      45deg,
+      rgba(0, 123, 255, 0.1) 25%,
+      transparent 25%,
+      transparent 75%,
+      rgba(0, 123, 255, 0.1) 75%
+    );
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(
+      to bottom,
+      #0056b3,
+      #003d82
+    );
+  }
+
+  .chemical-element {
+    background: rgba(42, 42, 42, 0.9);
+    color: #4dabf7;
+    border-color: rgba(77, 171, 247, 0.2);
+  }
+}
+  

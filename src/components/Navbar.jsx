@@ -40,6 +40,20 @@ const Navbar = () => {
           </li>
         </ul>
       </div>
+      
+      {/* 版权信息部分 */}
+      <div className="navbar-footer">
+        <div className="copyright-info">
+          <p className="copyright-text">
+            <span className="copyright-year">© 2024</span>
+            <br className="copyright-break" />
+            <span className="copyright-name">Lin Kai</span>
+          </p>
+          <p className="license-text">
+            MIT License
+          </p>
+        </div>
+      </div>
     </nav>
   );
 };

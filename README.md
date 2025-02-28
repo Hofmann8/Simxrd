@@ -1,15 +1,66 @@
-# Getting Started with Create React App
+# XRD 模拟系统
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+一个基于 React 的 XRD 数据模拟和分析系统。
 
-## Available Scripts
+## 最新更新
 
-In the project directory, you can run:
+### 2024-02-28
+- 优化了参数匹配算法
+- 添加了智能参数建议功能
+  - 当匹配度低于70%时，系统会分析每个参数
+  - 只显示确实可以提升到70%匹配度的参数建议区间
+  - 在滑动条下方可视化显示建议区间
+  - 当所有参数都无法单独调整到70%时，给出整体调整建议
+- 改进了数据加载的错误处理
+- 将表单配置抽离到独立的配置文件
+- 优化了代码结构和性能
 
-### `npm start`
+## 功能特点
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+- 实验参数输入与验证
+- XRD 数据可视化
+- 实时动态模拟
+- 智能参数匹配
+- 结果分析与建议
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## 使用说明
+
+1. 输入实验参数
+2. 点击"开始模拟"
+3. 查看模拟结果和匹配建议
+4. 根据建议调整参数
+
+## 开发环境
+
+- Node.js
+- React
+- Bootstrap
+- ECharts
+
+## 安装与运行
+
+```bash
+# 安装依赖
+npm install
+
+# 启动开发服务器
+npm start
+```
+
+## 项目结构
+
+```
+src/
+  ├── components/        # 组件
+  ├── config/           # 配置文件
+  ├── utils/            # 工具函数
+  ├── pages/            # 页面组件
+  └── App.js           # 主应用
+```
+
+## 注意事项
+
+- 确保 public/data.json 和 public/xrd_data/ 目录下的数据文件格式正确
+- 参数建议仅供参考，具体实验条件需要根据实际情况调整
+```
+
