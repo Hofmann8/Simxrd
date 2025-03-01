@@ -212,89 +212,115 @@ const ResultCard = ({ resultData }) => {
   };
 
   return (
-    <div className="card mt-4">
-      <div className="card-body p-0">
-        {/* 工具栏切换按钮 */}
-        <div className="position-absolute" style={{ right: '15px', top: '15px', zIndex: 1000 }}>
-          <button 
-            className="btn btn-sm btn-outline-secondary"
-            onClick={() => setShowToolbar(!showToolbar)}
-            title={showToolbar ? "隐藏工具栏" : "显示工具栏"}
-          >
-            <FaTools />
-          </button>
-        </div>
+    <div className="result-card">
+      <style jsx>{`
+        .result-card {
+          width: 100%;
+          margin-top: 2rem;
+        }
 
-        {/* 图表区域 */}
-        <div style={{ height: '400px', position: 'relative' }}>
-          <ReactECharts 
-            option={getChartOptions()} 
-            style={{ height: '100%', width: '100%' }}
-            notMerge={true}
-            lazyUpdate={false}
-          />
-        </div>
+        /* 覆盖 Bootstrap 卡片样式 */
+        :global(.card) {
+          border-radius: 12px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          border: none;
+        }
 
-        {/* 工具栏 */}
-        <CSSTransition
-          in={showToolbar}
-          timeout={300}
-          classNames="toolbar"
-          unmountOnExit
-        >
-          <div className="border-top">
-            <ToolBar
-              onSpeedChange={handleSpeedChange}
-              currentSpeed={speed}
-              onGenerate={handleGenerate}
-              onPause={handlePause}
-              isPaused={isPaused}
-              onReset={handleReset}
+        :global(.card-body) {
+          padding: 2rem;
+        }
+
+        /* 图表容器样式 */
+        :global(.chart-container) {
+          width: 100%;
+          min-height: 400px;
+          margin: 1.5rem 0;
+        }
+      `}</style>
+      <div className="card mt-4">
+        <div className="card-body p-0">
+          {/* 工具栏切换按钮 */}
+          <div className="position-absolute" style={{ right: '15px', top: '15px', zIndex: 1000 }}>
+            <button 
+              className="btn btn-sm btn-outline-secondary"
+              onClick={() => setShowToolbar(!showToolbar)}
+              title={showToolbar ? "隐藏工具栏" : "显示工具栏"}
+            >
+              <FaTools />
+            </button>
+          </div>
+
+          {/* 图表区域 */}
+          <div style={{ height: '400px', position: 'relative' }}>
+            <ReactECharts 
+              option={getChartOptions()} 
+              style={{ height: '100%', width: '100%' }}
+              notMerge={true}
+              lazyUpdate={false}
             />
           </div>
-        </CSSTransition>
 
-        {/* 展开/收起按钮 */}
-        <div 
-          className="text-center py-2 border-top" 
-          style={{ cursor: 'pointer' }}
-          onClick={() => setShowDetails(!showDetails)}
-        >
-          {showDetails ? <FaChevronUp /> : <FaChevronDown />}
-        </div>
+          {/* 工具栏 */}
+          <CSSTransition
+            in={showToolbar}
+            timeout={300}
+            classNames="toolbar"
+            unmountOnExit
+          >
+            <div className="border-top">
+              <ToolBar
+                onSpeedChange={handleSpeedChange}
+                currentSpeed={speed}
+                onGenerate={handleGenerate}
+                onPause={handlePause}
+                isPaused={isPaused}
+                onReset={handleReset}
+              />
+            </div>
+          </CSSTransition>
 
-        {/* 详细信息区域 */}
-        {showDetails && (
-          <div className="p-3 border-top">
-            {resultData.similarity !== undefined && (
-              <div className={getMatchingStyle(resultData.similarity).className}>
-                <div className="d-flex align-items-center">
-                  <span className="me-2" style={{ fontSize: '1.2em' }}>
-                    {getMatchingStyle(resultData.similarity).icon}
-                  </span>
-                  <div>
-                    <strong>{getMatchingStyle(resultData.similarity).text}</strong>
-                    <div>匹配度: {resultData.similarity.toFixed(1)}%</div>
+          {/* 展开/收起按钮 */}
+          <div 
+            className="text-center py-2 border-top" 
+            style={{ cursor: 'pointer' }}
+            onClick={() => setShowDetails(!showDetails)}
+          >
+            {showDetails ? <FaChevronUp /> : <FaChevronDown />}
+          </div>
+
+          {/* 详细信息区域 */}
+          {showDetails && (
+            <div className="p-3 border-top">
+              {resultData.similarity !== undefined && (
+                <div className={getMatchingStyle(resultData.similarity).className}>
+                  <div className="d-flex align-items-center">
+                    <span className="me-2" style={{ fontSize: '1.2em' }}>
+                      {getMatchingStyle(resultData.similarity).icon}
+                    </span>
+                    <div>
+                      <strong>{getMatchingStyle(resultData.similarity).text}</strong>
+                      <div>匹配度: {resultData.similarity.toFixed(1)}%</div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
-            <div className="row">
-              <div className="col-md-6">
-                <h6>分析结果:</h6>
-                <p>{resultData.result}</p>
-              </div>
-              <div className="col-md-6">
-                <img 
-                  src={resultData.img} 
-                  alt="XRD Result" 
-                  className="img-fluid"
-                  style={{ maxHeight: '300px' }}
-                />
+              )}
+              <div className="row">
+                <div className="col-md-6">
+                  <h6>分析结果:</h6>
+                  <p>{resultData.result}</p>
+                </div>
+                <div className="col-md-6">
+                  <img 
+                    src={resultData.img} 
+                    alt="XRD Result" 
+                    className="img-fluid"
+                    style={{ maxHeight: '300px' }}
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

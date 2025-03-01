@@ -16,6 +16,16 @@ const XRDChart = ({ data, speed, instantGenerate }) => {
     }
 
     if (!chartRef.current) {
+      echarts.setCanvasCreator(() => {
+        const canvas = document.createElement('canvas');
+        canvas.addEventListener = function(type, listener, options) {
+          options = options || {};
+          options.passive = true;
+          return HTMLCanvasElement.prototype.addEventListener.call(this, type, listener, options);
+        };
+        return canvas;
+      });
+      
       chartRef.current = echarts.init(chartContainer);
 
       chartRef.current.setOption({

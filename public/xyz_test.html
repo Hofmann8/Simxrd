@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>JSmol XYZ测试</title>
+  <script type="text/javascript" src="./jsmol/JSmol.min.js"></script>
+  <style>
+    #jsmolDiv {
+      width: 600px;
+      height: 400px;
+      margin: 0 auto;
+      border: 1px solid black;
+    }
+    button {
+      margin: 10px;
+      padding: 5px 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>JSmol XYZ文件测试</h1>
+  <div>
+    <button onclick="loadXYZ('./xyz_data/FAU.xyz')">加载FAU</button>
+    <button onclick="loadXYZ('./xyz_data/LTA.xyz')">加载LTA</button>
+    <button onclick="loadXYZ('./xyz_data/SOD.xyz')">加载SOD</button>
+  </div>
+  <div id="jsmolDiv"></div>
+  <div id="status">加载中...</div>
+  
+  <script type="text/javascript">
+    // 简单的JSmol初始化
+    var jsmolApplet;
+    var Info = {
+      width: 600,
+      height: 400,
+      use: "HTML5",
+      j2sPath: "./jsmol/j2s",
+      script: "background white",
+      disableJ2SLoadMonitor: false,
+      disableInitialConsole: false,
+      debug: true
+    };
+    
+    // 加载XYZ文件
+    function loadXYZ(path) {
+      document.getElementById('status').textContent = '正在加载 ' + path + '...';
+      
+      // 直接使用JSmol的load命令
+      Jmol.script(jsmolApplet, 'load "' + path + '"; center; wireframe 0.15; spacefill 23%; spin on');
+      
+      document.getElementById('status').textContent = '已加载 ' + path;
+    }
+    
+    // 等待页面加载完成
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('status').textContent = '正在初始化JSmol...';
+      
+      // 创建JSmol实例
+      jsmolApplet = Jmol.getApplet("jsmolApplet", Info);
+      document.getElementById('jsmolDiv').innerHTML = Jmol.getAppletHtml(jsmolApplet);
+      
+      document.getElementById('status').textContent = 'JSmol已初始化，请点击按钮加载分子';
+    });
+  </script>
+</body>
+</html> 

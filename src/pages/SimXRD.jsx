@@ -136,12 +136,43 @@ const SimXRD = () => {
   };
 
   return (
-    <div className="container mt-5">
-      <XRDForm 
-        onSubmit={handleFormSubmit} 
-        suggestions={formSuggestions}  // 传递建议值给表单
-      />
-      {resultData && <ResultCard resultData={resultData} />}
+    <div className="container-fluid">
+      <div className="simxrd-container">
+        <style>{`
+          .simxrd-container {
+            padding: 2.5rem;
+            max-width: 2400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          }
+
+          :global(.container-fluid) {
+            padding: 0 40px;
+            max-width: 2400px;
+            margin: 0 auto;
+          }
+
+          :global(.card) {
+            width: 100%;
+            max-width: none;
+          }
+
+          :global(.form-row) {
+            margin: 0 -20px;
+          }
+
+          :global(.form-group) {
+            padding: 0 20px;
+          }
+        `}</style>
+        <XRDForm 
+          onSubmit={handleFormSubmit} 
+          suggestions={formSuggestions}
+        />
+        {resultData && <ResultCard resultData={resultData} />}
+      </div>
     </div>
   );
 };

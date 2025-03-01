@@ -1,19 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="Web site created using create-react-app"
-    />
-    <title>React App</title>
-  </head>
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-    <!--
+
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="description" content="Web site created using create-react-app" />
+  <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+  <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+  <title>React App</title>
+
+  <!-- 添加 jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <!-- JSmol 配置 -->
+  <script type="text/javascript">
+    // JSmol 初始化配置
+    var jmolApplet0; // 全局变量
+    var Info = {
+      width: '100%',
+      height: '100%',
+      debug: false,
+      color: 'white',
+      addSelectionOptions: false,
+      use: "HTML5",
+      j2sPath: "./jsmol/j2s",
+      jarPath: "./jsmol/java",
+      jarFile: "JmolApplet.jar",
+      isSigned: false,
+      readyFunction: function (applet) {
+        console.log("JSmol ready:", applet);
+        // 确保全局变量可用
+        window.jmolApplet0 = applet;
+      }
+    };
+  </script>
+
+  <!-- JSmol 核心文件 -->
+  <script type="text/javascript" src="%PUBLIC_URL%/jsmol/JSmol.min.js"></script>
+  <script type="text/javascript" src="%PUBLIC_URL%/jsmol/js/Jmol2.js"></script>
+  
+  <!-- 添加调试功能 -->
+  <script type="text/javascript">
+    window.onerror = function (msg, url, line) {
+      console.log("JS Error:", msg, "\nURL:", url, "\nLine:", line);
+      return false;
+    };
+  </script>
+</head>
+
+<body>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <div id="root"></div>
+  <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
 
@@ -23,10 +63,6 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
-  </body>
+</body>
+
 </html>
-
-<script src="/jsmol/JSmol.min.js"></script>
-
-
-

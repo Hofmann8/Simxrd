@@ -1,57 +1,137 @@
 /* 确保 app-layout 使用 flex 布局 */
 .app-layout {
-    display: flex;
-    height: 100vh;
-    margin: 0;
-  }
-  
-  /* Navbar 样式 */
-  .navbar {
-    width: 80px; /* 初始宽度，鼠标悬停时可拉宽 */
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    background-color: #f8f9fa;
-    padding-top: 20px;
-    box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    transition: width 0.3s ease;
-    z-index: 1000; /* 确保在最顶层 */
-  }
-  
-  /* 主内容区域 */
+  display: flex;
+  min-height: 100vh;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow-x: hidden;
+  /* 防止水平溢出 */
+}
+
+/* Navbar 样式 */
+.navbar {
+  width: 80px;
+  /* 初始宽度，鼠标悬停时可拉宽 */
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  background-color: #f8f9fa;
+  padding-top: 20px;
+  box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: width 0.3s ease;
+  z-index: 1000;
+  /* 确保在最顶层 */
+}
+
+/* 主内容区域 - 不要为导航栏留空间 */
+.content {
+  flex: 1;
+  padding: 40px;
+  max-width: 100%;
+  width: 100%;
+  margin-left: 80px;
+  /* 只为收起状态的导航栏留空间 */
+  transition: margin-left 0.3s ease;
+  overflow-x: hidden;
+  /* 防止水平溢出 */
+}
+
+/* 覆盖 Bootstrap 容器样式 */
+.container-fluid {
+  max-width: 100% !important;
+  padding: 0 !important;
+  overflow-x: hidden;
+  /* 防止水平溢出 */
+}
+
+/* Navbar 悬停时展开 */
+.navbar:hover {
+  width: 200px;
+  /* 扩展到 200px */
+}
+
+/* 页面淡入淡出效果 */
+.fade-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.fade-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.fade-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.fade-exit-active {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 300ms, transform 300ms;
+}
+
+/* 响应式布局 */
+@media (max-width: 1920px) {
   .content {
-    margin-left: 80px; /* 与 navbar 的初始宽度保持一致 */
+    padding: 30px;
+  }
+}
+
+@media (max-width: 1600px) {
+  .content {
+    padding: 25px;
+  }
+}
+
+/* 小屏幕设备 */
+@media (max-width: 1200px) {
+  .content {
     padding: 20px;
-    flex: 1;
-    overflow-y: auto;
+    min-width: auto;
+    /* 移除最小宽度限制 */
   }
-  
-  /* Navbar 悬停时展开 */
-  .navbar:hover {
-    width: 200px; /* 扩展到 200px */
+
+  .container-fluid {
+    min-width: auto !important;
+    /* 移除最小宽度限制 */
   }
-  
-  /* 页面淡入淡出效果 */
-  .fade-enter {
-    opacity: 0;
-    transform: translateY(10px);
+}
+
+/* 确保 app-container 使用 flex 布局 */
+.app-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* 内容容器 - 为左侧导航栏留出空间 */
+.content-container {
+  flex: 1;
+  padding: 20px;
+  margin-left: 80px; /* 与 Navbar 宽度一致 */
+  width: calc(100% - 80px); /* 减去 Navbar 宽度 */
+  transition: margin-left 0.3s ease, width 0.3s ease;
+}
+
+/* 当 Navbar 悬停展开时，内容区域也要相应调整 */
+.navbar:hover + .content-container {
+  margin-left: 200px; /* 与展开后的 Navbar 宽度一致 */
+  width: calc(100% - 200px); /* 减去展开后的 Navbar 宽度 */
+}
+
+/* 响应式布局 */
+@media (max-width: 768px) {
+  .content-container {
+    margin-left: 0;
+    width: 100%;
+    padding-top: 60px; /* 为顶部导航栏留出空间 */
   }
-  .fade-enter-active {
-    opacity: 1;
-    transform: translateY(0);
-    transition: opacity 300ms ease, transform 300ms ease;
-  }
-  .fade-exit {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  .fade-exit-active {
-    opacity: 0;
-    transform: translateY(10px);
-    transition: opacity 300ms ease, transform 300ms ease;
-  }
-  
+}

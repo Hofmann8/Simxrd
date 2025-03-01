@@ -1,25 +1,30 @@
 const { app, BrowserWindow } = require("electron");
 const path = require("path");
-const isDev = process.argv.includes('dev');
 
-let mainWindow;
+// 使用环境变量替代 electron-is-dev
+const isDev = !app.isPackaged;
 
 function createWindow() {
-  mainWindow = new BrowserWindow({
+  const mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
-      webSecurity: false  // 允许加载本地文件
+      webSecurity: false  // 在开发环境下暂时禁用 webSecurity 以方便调试
     }
   });
 
+  // 加载应用
+  mainWindow.loadURL(
+    isDev 
+      ? 'http://localhost:3000'
+      : `file://${path.join(__dirname, '../build/index.html')}`
+  );
+
+  // 在开发环境下打开开发者工具
   if (isDev) {
-    mainWindow.loadURL('http://localhost:3000');
     mainWindow.webContents.openDevTools();
-  } else {
-    mainWindow.loadFile(path.join(__dirname, '../build/index.html'));
   }
 
   mainWindow.on("closed", () => {
@@ -36,7 +41,7 @@ app.on("window-all-closed", () => {
 });
 
 app.on("activate", () => {
-  if (mainWindow === null) {
+  if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
   }
 });

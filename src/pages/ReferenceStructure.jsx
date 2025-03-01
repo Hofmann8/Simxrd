@@ -1,56 +1,131 @@
 import React, { useState } from 'react';
-import CrystalStructureDisplay from '../components/CrystalStructureDisplay';
+import CrystalStructureDisplay from '../components/crystal';
 
 const ReferenceStructure = () => {
-  const [selectedModel, setSelectedModel] = useState(null);
+  const [selectedStructure, setSelectedStructure] = useState(null); // 初始状态为 null，表示未选择
+  
+  const structures = [
+    { id: 'FAU', name: 'Y型分子筛 (FAU)' },
+    { id: 'LTA', name: 'A型分子筛 (LTA)' },
+    { id: 'SOD', name: '方钠石 (SOD)' }
+  ];
 
-  // 模型对应的文件路径
-  const modelOptions = {
-    FAU: '/xyz_data/FAU.xyz',
-    LTA: '/xyz_data/LTA.xyz',
-    SOD: '/xyz_data/SOD.xyz',
-  };
-
-  const handleModelSelection = (model) => {
-    setSelectedModel(model);
+  const handleStructureSelect = (id) => {
+    setSelectedStructure(id);
   };
 
   return (
-    <div style={{ padding: '20px' }}>
-      <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>参考晶体结构</h2>
-      <p style={{ textAlign: 'center' }}>遗留bug（解决后会删除）：每次更改模型后，后台实际加载准备工作慢于优化后的显示速度，导致模型切换后过一段时间会有DOM更新导致react渲染变化导致窗口小跳</p>
+    <div className="reference-container">
+      <style>{`
+        .reference-container {
+          padding: 2rem;
+          max-width: 100%;
+          margin: 0 auto;
+          background: #ffffff;
+          border-radius: 12px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          min-height: calc(100vh - 80px);
+          overflow-x: hidden;
+        }
 
-      {/* 按钮选择区域 */}
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginBottom: '1rem' }}>
-        {Object.keys(modelOptions).map((model) => (
+        .structure-selector {
+          display: flex;
+          gap: 1rem;
+          margin-bottom: 1.5rem;
+          justify-content: center;
+          flex-wrap: wrap;
+        }
+
+        .structure-btn {
+          padding: 0.75rem 1.5rem;
+          border: 1px solid #dee2e6;
+          border-radius: 8px;
+          background: white;
+          cursor: pointer;
+          transition: all 0.2s;
+          color: #495057;
+          font-weight: 500;
+          min-width: 180px;
+          text-align: center;
+          flex: 0 1 auto;
+        }
+
+        .structure-btn:hover {
+          background: #e9ecef;
+          border-color: #ced4da;
+        }
+
+        .structure-btn.active {
+          background: #0d6efd;
+          border-color: #0d6efd;
+          color: white;
+        }
+
+        .welcome-message {
+          text-align: center;
+          margin-top: 4rem;
+          color: #6c757d;
+        }
+
+        .welcome-title {
+          font-size: 1.75rem;
+          margin-bottom: 1rem;
+          color: #343a40;
+        }
+
+        .welcome-description {
+          font-size: 1.1rem;
+          max-width: 600px;
+          margin: 0 auto;
+          line-height: 1.6;
+        }
+
+        /* 响应式布局 */
+        @media (max-width: 768px) {
+          .structure-btn {
+            min-width: 120px;
+            padding: 0.5rem 1rem;
+            flex: 1 1 30%;
+          }
+          
+          .reference-container {
+            padding: 1rem;
+          }
+        }
+
+        @media (max-width: 576px) {
+          .structure-btn {
+            flex: 1 1 100%;
+          }
+          
+          .structure-selector {
+            flex-direction: column;
+            width: 100%;
+          }
+        }
+      `}</style>
+      
+      <div className="structure-selector">
+        {structures.map(structure => (
           <button
-            key={model}
-            onClick={() => handleModelSelection(model)}
-            style={{
-              padding: '10px 20px',
-              backgroundColor: selectedModel === model ? '#007bff' : '#f0f0f0',
-              color: selectedModel === model ? '#fff' : '#333',
-              border: '1px solid #ddd',
-              borderRadius: '5px',
-              cursor: 'pointer',
-              transition: 'background-color 0.3s',
-            }}
+            key={structure.id}
+            className={`structure-btn ${selectedStructure === structure.id ? 'active' : ''}`}
+            onClick={() => handleStructureSelect(structure.id)}
           >
-            {model}
+            {structure.name}
           </button>
         ))}
       </div>
-
-      {/* 显示选中模型或提示信息 */}
-      {selectedModel ? (
-        <CrystalStructureDisplay
-          filePath={modelOptions[selectedModel]} // 动态传递文件路径
-          modelName={selectedModel} // 动态传递模型名称
-        />
+      
+      {selectedStructure ? (
+        <CrystalStructureDisplay filePath={`/xyz_data/${selectedStructure}.xyz`} />
       ) : (
-        <p style={{ textAlign: 'center', fontStyle: 'italic', color: '#555' }}>
-          请选择一个模型以加载结构。
-        </p>
+        <div className="welcome-message">
+          <h2 className="welcome-title">欢迎使用晶体结构查看器</h2>
+          <p className="welcome-description">
+            请从上方选择一种晶体结构进行查看。您可以查看不同类型的分子筛结构，了解它们的晶体学特性和应用领域。
+          </p>
+        </div>
       )}
     </div>
   );

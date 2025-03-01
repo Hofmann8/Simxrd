@@ -16,11 +16,44 @@ const XRDForm = ({ onSubmit, suggestions }) => {
     setFormData((prevData) => ({ ...prevData, [id]: Number(value) }));
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSubmit(formData);
+  };
+
   return (
-    <form onSubmit={(e) => {
-      e.preventDefault();
-      onSubmit(formData);
-    }}>
+    <form onSubmit={handleSubmit}>
+      <style jsx>{`
+        form {
+          width: 100%;
+        }
+
+        /* 调整表单布局 */
+        :global(.form-row) {
+          display: flex;
+          flex-wrap: wrap;
+          margin: 0 -20px;
+        }
+
+        :global(.form-group) {
+          flex: 1;
+          min-width: 300px;
+          padding: 0 20px;
+          margin-bottom: 1.5rem;
+        }
+
+        /* 调整输入框样式 */
+        :global(.form-control) {
+          border-radius: 8px;
+          padding: 0.75rem 1rem;
+        }
+
+        /* 调整按钮样式 */
+        :global(.btn) {
+          padding: 0.75rem 2rem;
+          border-radius: 8px;
+        }
+      `}</style>
       <h2 className="text-center mb-4">实验参数设置</h2>
       <div className="row g-4">
         {Object.entries(formFields).map(([key, field]) => (

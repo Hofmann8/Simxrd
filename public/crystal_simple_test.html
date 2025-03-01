@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>简化晶体结构显示测试</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .jsmol-container {
+      width: 100%;
+      height: 400px;
+      border: 1px solid #ccc;
+      margin-bottom: 20px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      padding: 8px 16px;
+      cursor: pointer;
+    }
+
+    .active {
+      background-color: #e6f7ff;
+      border: 1px solid #1890ff;
+      color: #1890ff;
+    }
+  </style>
+  <!-- 加载JSmol库 -->
+  <script type="text/javascript" src="./jsmol/JSmol.min.js"></script>
+</head>
+
+<body>
+  <div class="container">
+    <h1>简化晶体结构显示测试</h1>
+
+    <div class="controls">
+      <button id="fau-btn" class="active">FAU (Y型分子筛)</button>
+      <button id="lta-btn">LTA (A型分子筛)</button>
+      <button id="sod-btn">SOD (方钠石)</button>
+    </div>
+
+    <div id="jsmol-viewer" class="jsmol-container"></div>
+
+    <div id="status">状态: 正在加载...</div>
+  </div>
+
+  <script type="text/javascript">
+    // 确保JSmol已加载
+    if (typeof Jmol === 'undefined') {
+      document.getElementById('status').textContent = '错误: JSmol库未加载，请检查路径';
+    }
+
+    // 全局变量
+    let jsmolApplet = null;
+    let isInitialized = false;
+
+    // 初始化JSmol
+    function initJSmol() {
+      if (isInitialized) return;
+
+      try {
+        const viewerDiv = document.getElementById('jsmol-viewer');
+        if (!viewerDiv) {
+          console.error('找不到jsmol-viewer元素');
+          return;
+        }
+
+        // 清空容器
+        viewerDiv.innerHTML = '';
+
+        // 创建JSmol信息对象
+        const Info = {
+          width: '100%',
+          height: '100%',
+          use: "HTML5",
+          j2sPath: "./jsmol/j2s",
+          script: "set antialiasdisplay; set antialiasimages; background white;",
+          disableJ2SLoadMonitor: false,
+          disableInitialConsole: false,
+          allowJavaScript: true,
+          color: "#FFFFFF",
+          addSelectionOptions: false,
+          serverURL: "./jsmol/php/jsmol.php",
+          readyFunction: function (applet) {
+            console.log("JSmol已准备就绪");
+            jsmolApplet = applet;
+            isInitialized = true;
+            document.getElementById('status').textContent = '状态: JSmol已加载';
+
+            // 延迟加载模型，确保JSmol完全初始化
+            setTimeout(function () {
+              loadModel('./xyz_data/FAU.xyz');
+            }, 1000);
+          }
+        };
+
+        // 创建JSmol实例
+        jsmolApplet = Jmol.getApplet("jsmolApplet0", Info);
+
+        // 将JSmol HTML添加到容器
+        viewerDiv.innerHTML = Jmol.getAppletHtml(jsmolApplet);
+
+        console.log("JSmol初始化完成");
+      } catch (error) {
+        console.error("初始化JSmol时出错:", error);
+        document.getElementById('status').textContent = `错误: 初始化JSmol时出错: ${error.message}`;
+      }
+    }
+
+    // 加载模型
+    function loadModel(path) {
+      if (!jsmolApplet) {
+        console.error("JSmol未初始化");
+        return;
+      }
+
+      document.getElementById('status').textContent = '状态: 正在加载模型...';
+      console.log("尝试加载模型:", path);
+
+      try {
+        fetch(path)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error(`文件不存在: ${path}`);
+            }
+            return response.text();
+          })
+          .then(data => {
+            console.log(`文件 ${path} 加载成功，长度:`, data.length);
+
+            // 使用eval执行JSmol命令，避免直接使用script方法可能的问题
+            Jmol.evaluateVar(jsmolApplet, `load data "model"\n${data}\nend "model"; center`);
+            Jmol.evaluateVar(jsmolApplet, 'wireframe 0.15; spacefill 23%; spin on');
+
+            document.getElementById('status').textContent = '状态: 模型已加载 - ' + path.split('/').pop();
+          })
+          .catch(error => {
+            console.error("加载文件失败:", error);
+            document.getElementById('status').textContent = `错误: ${error.message}`;
+          });
+      } catch (error) {
+        console.error("执行JSmol命令时出错:", error);
+        document.getElementById('status').textContent = `错误: 执行JSmol命令时出错: ${error.message}`;
+      }
+    }
+
+    // 设置活动按钮
+    function setActiveButton(activeId, allIds) {
+      allIds.forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) {
+          btn.classList.toggle('active', id === activeId);
+        }
+      });
+    }
+
+    // 等待页面加载完成
+    document.addEventListener('DOMContentLoaded', function () {
+      console.log("页面已加载，准备初始化JSmol");
+
+      // 延迟初始化JSmol，确保DOM已完全加载
+      setTimeout(initJSmol, 500);
+
+      // 模型选择按钮
+      document.getElementById('fau-btn').addEventListener('click', function () {
+        setActiveButton('fau-btn', ['fau-btn', 'lta-btn', 'sod-btn']);
+        loadModel('./xyz_data/FAU.xyz');
+      });
+
+      document.getElementById('lta-btn').addEventListener('click', function () {
+        setActiveButton('lta-btn', ['fau-btn', 'lta-btn', 'sod-btn']);
+        loadModel('./xyz_data/LTA.xyz');
+      });
+
+      document.getElementById('sod-btn').addEventListener('click', function () {
+        setActiveButton('sod-btn', ['fau-btn', 'lta-btn', 'sod-btn']);
+        loadModel('./xyz_data/SOD.xyz');
+      });
+    });
+  </script>
+</body>
+
+</html>
