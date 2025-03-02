@@ -1,17 +1,32 @@
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, protocol } = require("electron");
 const path = require("path");
+const fs = require("fs");
 const isDev = process.argv.includes('dev');
 
 let mainWindow;
+
+// 注册自定义协议处理器
+function registerFileProtocol() {
+  protocol.registerFileProtocol('file', (request, callback) => {
+    const url = request.url.replace('file://', '');
+    try {
+      return callback(decodeURIComponent(url));
+    } catch (error) {
+      console.error('Protocol handler error:', error);
+      return callback(404);
+    }
+  });
+}
 
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-      webSecurity: false  // 允许加载本地文件
+      nodeIntegration: false,
+      contextIsolation: true,
+      webSecurity: false,  // 允许加载本地文件
+      preload: path.join(__dirname, 'preload.js')
     }
   });
 
@@ -27,7 +42,10 @@ function createWindow() {
   });
 }
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+  registerFileProtocol();
+  createWindow();
+});
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {

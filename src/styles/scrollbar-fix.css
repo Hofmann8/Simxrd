@@ -1,0 +1,28 @@
+/* 基础容器样式 */
+.container, 
+.container-fluid {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+/* 为 CrystalStructureDisplay 组件添加固定宽度 */
+.crystal-structure-container {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0 8px;
+}
+
+/* 为 ReferenceStructure 页面添加固定宽度容器 */
+.reference-structure-container {
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* App 容器 */
+.App {
+  width: 100%;
+  position: relative;
+  overflow-x: hidden;
+  box-sizing: border-box;
+} 

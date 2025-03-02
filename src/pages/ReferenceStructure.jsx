@@ -1,8 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import CrystalStructureDisplay from '../components/CrystalStructureDisplay';
 
 const ReferenceStructure = () => {
   const [selectedModel, setSelectedModel] = useState(null);
+  const [isElectron, setIsElectron] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  useEffect(() => {
+    // 检测是否在 Electron 环境中
+    setIsElectron(window.electron !== undefined);
+  }, []);
 
   // 模型对应的文件路径
   const modelOptions = {
@@ -12,16 +19,26 @@ const ReferenceStructure = () => {
   };
 
   const handleModelSelection = (model) => {
+    setErrorMessage(''); // 清除之前的错误
+    
+    // 在 Electron 环境中检查文件是否存在
+    if (isElectron && window.electronAPI) {
+      const fileExists = window.electronAPI.fileExists(modelOptions[model]);
+      if (!fileExists) {
+        setErrorMessage(`文件 ${modelOptions[model]} 不存在，请确保数据文件已正确安装。`);
+        return;
+      }
+    }
+    
     setSelectedModel(model);
   };
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div className="reference-structure-container">
       <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>参考晶体结构</h2>
-      <p style={{ textAlign: 'center' }}>遗留bug（解决后会删除）：每次更改模型后，后台实际加载准备工作慢于优化后的显示速度，导致模型切换后过一段时间会有DOM更新导致react渲染变化导致窗口小跳</p>
-
-      {/* 按钮选择区域 */}
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginBottom: '1rem' }}>
+      
+      {/* 模型选择按钮 */}
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '20px' }}>
         {Object.keys(modelOptions).map((model) => (
           <button
             key={model}
@@ -30,16 +47,30 @@ const ReferenceStructure = () => {
               padding: '10px 20px',
               backgroundColor: selectedModel === model ? '#007bff' : '#f0f0f0',
               color: selectedModel === model ? '#fff' : '#333',
-              border: '1px solid #ddd',
+              border: '1px solid #ccc',
               borderRadius: '5px',
               cursor: 'pointer',
-              transition: 'background-color 0.3s',
+              fontWeight: selectedModel === model ? 'bold' : 'normal',
             }}
           >
             {model}
           </button>
         ))}
       </div>
+
+      {/* 错误信息显示 */}
+      {errorMessage && (
+        <div style={{ 
+          color: 'red', 
+          textAlign: 'center', 
+          padding: '10px', 
+          margin: '10px 0', 
+          backgroundColor: '#ffeeee', 
+          borderRadius: '5px' 
+        }}>
+          {errorMessage}
+        </div>
+      )}
 
       {/* 显示选中模型或提示信息 */}
       {selectedModel ? (

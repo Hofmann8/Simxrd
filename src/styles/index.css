@@ -1,0 +1,22 @@
+/* 基础样式重置 */
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    overflow-x: hidden;
+    position: relative;
+}
+
+#root {
+    width: 100%;
+    position: relative;
+}

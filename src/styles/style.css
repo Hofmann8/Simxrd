@@ -44,10 +44,10 @@ button:hover {
 }
 
 #xrd-image {
-    max-width: 100%;      /* 设置图片的最大宽度，保持响应式 */
-    max-height: 500px;    /* 限制图片的最大高度 */
-    display: block;       /* 将图片设置为块级元素，方便布局 */
-    margin: 20px auto;    /* 将图片水平居中 */
+    max-width: 100%;
+    max-height: 500px;
+    display: block;
+    margin: 20px auto;
 }
 
 .card {
@@ -60,12 +60,11 @@ button:hover {
     transform: translateY(-5px);
 }
 
-
 .chart-container {
     width: 100%;
     height: 400px;
     position: relative;
-    border: 1px solid #ccc; /* 增加边框让图表区域更明显 */
+    border: 1px solid #ccc;
     background-color: #f8f9fa;
 }
 
@@ -79,143 +78,51 @@ button:hover {
     text-align: center;
 }
 
-/* 图表容器大小 */
 #xrd-chart {
     width: 100%;
     height: 400px;
 }
 
-/* ToolBar 初始和收回状态 */
+/* ToolBar 动画 */
 .toolbar-transition-enter {
     opacity: 0;
-    transform: scale(0.5); /* 初始缩小 */
-  }
-  .toolbar-transition-enter-active {
-    opacity: 1;
-    transform: scale(1); /* 展开到正常大小 */
-    transition: transform 300ms ease, opacity 300ms ease;
-  }
-  .toolbar-transition-exit {
+    transform: scale(0.5);
+}
+.toolbar-transition-enter-active {
     opacity: 1;
     transform: scale(1);
-  }
-  .toolbar-transition-exit-active {
-    opacity: 0;
-    transform: scale(0.5); /* 缩回 */
     transition: transform 300ms ease, opacity 300ms ease;
-  }
-  
-/* 自定义滚动条样式 */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
 }
-
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 4px;
-  /* 添加周期表背景图案 */
-  background-image: linear-gradient(
-    45deg,
-    rgba(0, 123, 255, 0.05) 25%,
-    transparent 25%,
-    transparent 75%,
-    rgba(0, 123, 255, 0.05) 75%
-  );
-  background-size: 20px 20px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(
-    to bottom,
-    #007bff,
-    #00a0ff
-  );
-  border-radius: 4px;
-  border: 2px solid transparent;
-  background-clip: content-box;
-  /* 添加化学元素符号装饰 */
-  position: relative;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(
-    to bottom,
-    #0056b3,
-    #007bff
-  );
-}
-
-/* 添加化学元素装饰 */
-.chemical-scrollbar-decoration {
-  position: fixed;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  pointer-events: none;
-  z-index: 1000;
-  opacity: 0.5;
-}
-
-.chemical-element {
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Roboto Mono', monospace;
-  font-size: 12px;
-  color: #007bff;
-  border: 1px solid rgba(0, 123, 255, 0.2);
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.9);
-}
-
-/* 滚动条出现时的动画效果 */
-@keyframes fadeInScrollbar {
-  from {
-    opacity: 0;
-    transform: translateX(10px);
-  }
-  to {
+.toolbar-transition-exit {
     opacity: 1;
-    transform: translateX(0);
-  }
+    transform: scale(1);
+}
+.toolbar-transition-exit-active {
+    opacity: 0;
+    transform: scale(0.5);
+    transition: transform 300ms ease, opacity 300ms ease;
 }
 
-/* 当有滚动条时显示化学元素装饰 */
-.has-scrollbar .chemical-scrollbar-decoration {
-  animation: fadeInScrollbar 0.3s ease forwards;
+/* 页面容器样式 */
+.page-container {
+    max-width: calc(100% - 80px);
+    margin-left: 80px;
+    box-sizing: border-box;
 }
 
-/* 适配暗色模式 */
-@media (prefers-color-scheme: dark) {
-  ::-webkit-scrollbar-track {
-    background: #2a2a2a;
-    background-image: linear-gradient(
-      45deg,
-      rgba(0, 123, 255, 0.1) 25%,
-      transparent 25%,
-      transparent 75%,
-      rgba(0, 123, 255, 0.1) 75%
-    );
-  }
+.navbar {
+    position: fixed;
+    z-index: 1000;
+}
 
-  ::-webkit-scrollbar-thumb {
-    background: linear-gradient(
-      to bottom,
-      #0056b3,
-      #003d82
-    );
-  }
+.reference-structure-container {
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+}
 
-  .chemical-element {
-    background: rgba(42, 42, 42, 0.9);
-    color: #4dabf7;
-    border-color: rgba(77, 171, 247, 0.2);
-  }
+/* App 容器样式 */
+.App {
+    min-height: 100vh;
 }
   

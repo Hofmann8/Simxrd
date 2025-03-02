@@ -1,27 +1,39 @@
 import React, { useEffect, useRef } from 'react';
 
-const CrystalStructureViewer = ({ filePath, displayOptions }) => {
+const CrystalStructureViewer = ({ filePath, displayOptions, saveViewerState, savedState }) => {
   const viewerRef = useRef(null);
+  const isElectron = window.electron !== undefined;
 
   useEffect(() => {
     if (!window.Jmol) {
-      console.error('JSmol is not loaded. Ensure JSmol.min.js and related files are properly included.');
+      console.error('JSmol 未加载。请确保 JSmol.min.js 和相关文件已正确包含。');
       return;
     }
 
     const viewerContainer = viewerRef.current;
 
     if (!viewerContainer) {
-      console.error('Viewer container is not available.');
+      console.error('查看器容器不可用。');
       return;
+    }
+
+    // 处理 Electron 环境下的文件路径
+    let processedFilePath = filePath;
+    if (isElectron && window.electronAPI) {
+      // 使用预加载脚本中暴露的 API 处理路径
+      processedFilePath = window.electronAPI.convertFilePath(filePath);
+      console.log('Electron 环境下的文件路径:', processedFilePath);
     }
 
     const jsmolOptions = {
       width: '100%',
       height: '100%',
-      j2sPath: '/jsmol/j2s', // 确保路径正确
-      script: `load ${filePath}; display all;`,
+      j2sPath: isElectron && window.electronAPI ? window.electronAPI.getJsmolPath() : '/jsmol/j2s',
+      script: `load "${processedFilePath}"; display all;`,
       disableInitialConsole: true, // 禁用初始控制台输出
+      use: 'HTML5',  // 强制使用 HTML5 渲染器
+      disableJ2SLoadMonitor: true,
+      debug: isElectron // 在 Electron 中启用调试
     };
 
     let jsmolViewer;
@@ -33,11 +45,18 @@ const CrystalStructureViewer = ({ filePath, displayOptions }) => {
 
         if (jsmolViewer) {
           viewerContainer.innerHTML = window.Jmol.getAppletHtml(jsmolViewer);
+          
+          // 如果有保存的状态，恢复它
+          if (savedState && Object.keys(savedState).length > 0) {
+            setTimeout(() => {
+              window.Jmol.script(window.jsmolViewer, savedState.script || '');
+            }, 500);
+          }
         } else {
-          console.error('Failed to generate JSmol applet HTML.');
+          console.error('无法生成 JSmol applet HTML。');
         }
       } catch (error) {
-        console.error('Error initializing JSmol Viewer:', error);
+        console.error('初始化 JSmol 查看器时出错:', error);
       }
     };
 
@@ -48,11 +67,11 @@ const CrystalStructureViewer = ({ filePath, displayOptions }) => {
         viewerContainer.innerHTML = ''; // 防止内存泄漏
       }
     };
-  }, [filePath]); // 初始化时只依赖 filePath
+  }, [filePath, isElectron, savedState]); // 初始化时依赖 filePath 和 isElectron
 
   // 动态更新显示选项
   useEffect(() => {
-    if (!window.Jmol || !viewerRef.current) return;
+    if (!window.Jmol || !viewerRef.current || !window.jsmolViewer) return;
 
     const generateJmolScript = () => {
       let script = '';
@@ -87,22 +106,28 @@ const CrystalStructureViewer = ({ filePath, displayOptions }) => {
         script += 'axes off;';
       }
 
+      // 保存当前状态
+      if (saveViewerState) {
+        saveViewerState({ script });
+      }
+
       return script;
     };
 
     const script = generateJmolScript();
-    window.Jmol.script(window.jsmolViewer, script); // 动态更新显示选项
-  }, [displayOptions]); // 每次 displayOptions 更新时调用
+    try {
+      window.Jmol.script(window.jsmolViewer, script); // 动态更新显示选项
+    } catch (error) {
+      console.error('执行 JSmol 脚本时出错:', error);
+    }
+  }, [displayOptions, saveViewerState]); // 每次 displayOptions 更新时调用
 
   return (
-    <div
-      ref={viewerRef}
-      style={{
-        width: '100%',
-        height: '600px',
-        border: '1px solid #ddd',
-        borderRadius: '8px',
-        overflow: 'hidden',
+    <div 
+      ref={viewerRef} 
+      style={{ 
+        width: '100%', 
+        height: '100%',
       }}
     />
   );
