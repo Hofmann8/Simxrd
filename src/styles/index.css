@@ -9,14 +9,96 @@ body {
     padding: 0;
     width: 100%;
     height: 100%;
+    /* 隐藏主体滚动条 */
+    overflow: hidden;
 }
 
 body {
-    overflow-x: hidden;
     position: relative;
+    /* 始终保留滚动条空间，防止布局弹跳 */
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+/* 当内容超出时才显示滚动条 */
+html.has-scroll body {
+    /* 当内容需要滚动时，这个规则不再需要 */
 }
 
 #root {
     width: 100%;
+    height: 100%;
     position: relative;
+}
+
+/* 应用布局容器 - 永远不会有滚动条 */
+.app-layout {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+}
+
+/* 内容区域 - 可能会有滚动条 */
+.content {
+    flex: 1;
+    overflow-y: auto;
+    /* 确保滚动条不会影响内容布局 */
+    padding-right: 6px;
+    /* 与滚动条宽度相同 */
+}
+
+/* 现代化滚动条样式 - 更精致的设计 */
+/* Webkit浏览器 (Chrome, Safari, Edge等) */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.25);
+}
+
+::-webkit-scrollbar-corner {
+    background: transparent;
+}
+
+/* Firefox浏览器 */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+}
+
+/* 对于需要单独滚动的容器 */
+.scrollable-container {
+    overflow-y: auto;
+    padding-right: 6px;
+    scrollbar-width: thin;
+}
+
+/* 为CrystalStructureViewer组件添加滚动容器样式 */
+.crystal-structure-container {
+    scrollbar-width: thin;
+}
+
+/* 滚动条在悬停时的动画效果 */
+@media (hover: hover) {
+    ::-webkit-scrollbar-thumb {
+        opacity: 0.5;
+    }
+
+    *:hover::-webkit-scrollbar-thumb {
+        opacity: 1;
+    }
 }
