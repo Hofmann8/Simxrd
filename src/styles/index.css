@@ -31,21 +31,25 @@ html.has-scroll body {
     position: relative;
 }
 
-/* 应用布局容器 - 永远不会有滚动条 */
+/* 应用布局容器 */
 .app-layout {
-    width: 100%;
+    width: calc(100% - 80px); /* 减去导航栏宽度 */
     height: 100%;
+    position: relative;
     overflow: hidden;
-    display: flex;
+    margin-left: 80px; /* 为导航栏留出空间 */
 }
 
-/* 内容区域 - 可能会有滚动条 */
+/* 内容区域 */
 .content {
-    flex: 1;
+    width: 100%;
+    height: 100%;
     overflow-y: auto;
-    /* 确保滚动条不会影响内容布局 */
-    padding-right: 6px;
-    /* 与滚动条宽度相同 */
+    overflow-x: hidden;
+    padding: 20px;
+    position: relative;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
 }
 
 /* 现代化滚动条样式 - 更精致的设计 */
@@ -83,13 +87,32 @@ html.has-scroll body {
 /* 对于需要单独滚动的容器 */
 .scrollable-container {
     overflow-y: auto;
+    overflow-x: hidden;
     padding-right: 6px;
     scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
 }
 
 /* 为CrystalStructureViewer组件添加滚动容器样式 */
 .crystal-structure-container {
-    scrollbar-width: thin;
+    height: 100%;
+    width: 100%;
+    overflow: hidden; /* 防止整体溢出 */
+    display: flex;
+    flex-direction: column;
+}
+
+/* 确保工具栏不会溢出 */
+.crystal-structure-container .bg-light {
+    flex-shrink: 0; /* 防止工具栏被压缩 */
+    overflow-x: auto; /* 在小屏幕上允许水平滚动 */
+    min-height: 80px; /* 确保有足够的高度 */
+}
+
+/* JSmol 查看器容器 */
+.crystal-structure-container .flex-grow-1 {
+    height: calc(100% - 80px); /* 减去工具栏高度 */
+    overflow: hidden;
 }
 
 /* 滚动条在悬停时的动画效果 */
@@ -101,4 +124,377 @@ html.has-scroll body {
     *:hover::-webkit-scrollbar-thumb {
         opacity: 1;
     }
+}
+
+/* 现代化页面标题样式 - 修复冲突 */
+.content .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 15px;
+  margin-bottom: 20px; /* 移除 !important */
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  position: relative;
+  width: 100%;
+}
+
+.content .page-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+}
+
+.content .page-title h2 {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #333;
+  position: relative;
+  line-height: 1.2;
+}
+
+.content .page-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: #3498db;
+  background: rgba(52, 152, 219, 0.1);
+  padding: 10px;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+/* 覆盖 style.css 中的按钮样式 */
+.content .info-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  color: #6c757d;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  margin-left: auto;
+  flex-shrink: 0;
+  width: auto; /* 覆盖 style.css 中的 width: 100% */
+}
+
+.content .info-button:hover {
+  background-color: #e9ecef;
+  color: #495057;
+}
+
+.content .info-button svg {
+  font-size: 1rem;
+}
+
+/* 页面过渡动画 */
+.page-transition-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms ease-out, transform 300ms ease-out;
+}
+
+.page-transition-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.page-transition-exit-active {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 250ms ease-in, transform 250ms ease-in;
+}
+
+/* 确保内容在动画过程中不会溢出 */
+.content > div {
+  max-width: 100%;
+  overflow-x: hidden;
+  padding-right: 6px; /* 为滚动条预留空间 */
+}
+
+/* 首页样式 */
+.home-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 30px 20px;
+}
+
+.welcome-section {
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  padding: 30px;
+  margin: 30px 0;
+  border-left: 4px solid #3498db;
+}
+
+.welcome-section h3 {
+  color: #2c3e50;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.welcome-section p {
+  color: #5a6a7e;
+  line-height: 1.6;
+  font-size: 1.05rem;
+}
+
+.feature-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 25px;
+  margin-top: 30px;
+}
+
+.feature-card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  padding: 25px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.feature-icon {
+  background-color: rgba(52, 152, 219, 0.1);
+  color: #3498db;
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.feature-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.feature-content h4 {
+  color: #2c3e50;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.feature-content p {
+  color: #5a6a7e;
+  margin-bottom: 20px;
+  line-height: 1.5;
+  flex-grow: 1;
+}
+
+.feature-link {
+  display: inline-flex;
+  align-items: center;
+  color: #3498db;
+  text-decoration: none;
+  font-weight: 500;
+  margin-top: auto;
+  transition: color 0.2s ease;
+}
+
+.feature-link:hover {
+  color: #2980b9;
+}
+
+.feature-link svg {
+  margin-left: 8px;
+  font-size: 14px;
+  transition: transform 0.2s ease;
+}
+
+.feature-link:hover svg {
+  transform: translateX(3px);
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .feature-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .welcome-section {
+    padding: 20px;
+  }
+}
+
+/* 确保所有内容容器都有一致的滚动行为 */
+.content > div,
+.reference-structure-container,
+.home-container,
+.about-container,
+.conformation-explanation-container {
+  max-width: 100%;
+  overflow-x: hidden;
+  padding-right: 6px; /* 为滚动条预留空间 */
+}
+
+/* 确保卡片内容区域的滚动行为一致 */
+.card-body {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+}
+
+/* 修复特定组件的滚动问题 */
+.xrd-chart-container,
+.form-container {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  max-height: 100%;
+}
+
+/* 晶体结构详细信息模态框 */
+.crystal-detail-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1050;
+  padding: 20px;
+}
+
+.crystal-detail-content {
+  background-color: white;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 900px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  animation: modal-fade-in 0.3s ease;
+}
+
+.crystal-detail-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.crystal-detail-header h4 {
+  margin: 0;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.crystal-detail-body {
+  padding: 20px;
+  overflow-y: auto;
+  max-height: calc(90vh - 130px);
+}
+
+.crystal-detail-footer {
+  padding: 16px 20px;
+  border-top: 1px solid #e9ecef;
+  display: flex;
+  justify-content: flex-end;
+}
+
+@keyframes modal-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 表格样式优化 */
+.crystal-detail-body .table {
+  margin-bottom: 0;
+}
+
+.crystal-detail-body .table th {
+  width: 30%;
+  color: #495057;
+}
+
+.crystal-detail-body h5 {
+  color: #3498db;
+  font-weight: 600;
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .crystal-detail-content {
+    max-width: 95%;
+  }
+  
+  .crystal-detail-body {
+    padding: 15px;
+  }
+  
+  .crystal-detail-body .row {
+    flex-direction: column;
+  }
+  
+  .crystal-detail-body .col-md-6 {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+}
+
+/* JSmol 占位符样式 */
+.jsmol-placeholder {
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  border: 1px dashed #dee2e6;
+}
+
+/* 确保模态框在 JSmol 之上 */
+.crystal-detail-modal {
+  z-index: 9999;
+}
+
+/* 详细信息卡片样式 */
+.reference-structure-container .text-primary {
+  color: #3498db !important;
+}
+
+.reference-structure-container .table th {
+  color: #495057;
+  font-weight: 600;
+}
+
+.reference-structure-container .table td {
+  color: #333;
+}
+
+/* 确保卡片内容有足够的间距 */
+.reference-structure-container .card-body {
+  padding: 1.25rem;
 }

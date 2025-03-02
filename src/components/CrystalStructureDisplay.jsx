@@ -1,33 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FaCubes, FaRulerCombined, FaVectorSquare } from 'react-icons/fa';
+import { FaCubes, FaVectorSquare } from 'react-icons/fa';
 import CrystalStructureViewer from './CrystalStructureViewer';
 
 const CrystalStructureDisplay = ({ filePath, modelName }) => {
-  const viewerStateRef = useRef({}); // 存储模型的角度和缩放状态
+  const viewerStateRef = useRef({});
   const [displayOptions, setDisplayOptions] = useState({
-    frameworkStyle: 'wireframe', // 默认显示风格
-    depthFading: 'none',
+    frameworkStyle: 'wireframe',
     axes: false,
   });
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-
-  // 监听窗口大小变化
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth);
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
 
   // 重置工具栏状态
   useEffect(() => {
     setDisplayOptions({
       frameworkStyle: 'wireframe',
-      depthFading: 'none',
       axes: false,
     });
   }, [filePath]);
@@ -40,119 +25,49 @@ const CrystalStructureDisplay = ({ filePath, modelName }) => {
   };
 
   const saveViewerState = (state) => {
-    viewerStateRef.current = state; // 保存当前的显示状态
+    viewerStateRef.current = state;
   };
 
-  // 根据窗口宽度确定布局方向
-  const isSmallScreen = windowWidth < 992;
-
   return (
-    <div className="crystal-structure-container">
-      <div style={{
-        display: 'flex',
-        flexDirection: isSmallScreen ? 'column' : 'row',
-        gap: '1rem',
-        justifyContent: 'center',
-        alignItems: isSmallScreen ? 'center' : 'flex-start',
-        margin: '20px 0',
-        width: '100%',
-        maxWidth: '100%',
-      }}>
-        {/* Viewer 区域 */}
-        <div
-          style={{
-            border: '1px solid #ddd',
-            borderRadius: '8px',
-            overflow: 'hidden',
-            width: isSmallScreen ? '100%' : '600px',
-            height: '600px',
-            maxWidth: '100%',
-          }}
-        >
+    <div className="crystal-structure-container h-100">
+      <div className="d-flex flex-column h-100">
+        {/* 顶部控制面板 */}
+        <div className="bg-light border-bottom p-3">
+          <div className="row g-2">
+            <div className="col-md-6">
+              <label className="form-label d-flex align-items-center mb-1">
+                <FaCubes className="me-2 text-primary" /> 显示风格
+              </label>
+              <select
+                value={displayOptions.frameworkStyle}
+                onChange={(e) => handleOptionChange('frameworkStyle', e.target.value)}
+                className="form-select form-select-sm"
+              >
+                <option value="wireframe">线框模式</option>
+                <option value="ballStick">球棒模型</option>
+              </select>
+            </div>
+            <div className="col-md-6">
+              <label className="form-label d-flex align-items-center mb-1">
+                <FaVectorSquare className="me-2 text-primary" /> 坐标轴
+              </label>
+              <button
+                onClick={() => handleOptionChange('axes', !displayOptions.axes)}
+                className={`btn btn-sm w-100 ${displayOptions.axes ? 'btn-primary' : 'btn-outline-secondary'}`}
+              >
+                {displayOptions.axes ? '隐藏坐标轴' : '显示坐标轴'}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* JSmol 查看器区域 */}
+        <div className="flex-grow-1 position-relative">
           <CrystalStructureViewer
             filePath={filePath}
             displayOptions={displayOptions}
             saveViewerState={saveViewerState}
-            savedState={viewerStateRef.current}
           />
-        </div>
-
-        {/* 控制面板 */}
-        <div
-          style={{
-            width: isSmallScreen ? '100%' : '300px',
-            padding: '15px',
-            border: '1px solid #ddd',
-            borderRadius: '8px',
-            backgroundColor: '#f9f9f9',
-          }}
-        >
-          <h4 style={{ textAlign: 'center', marginBottom: '1rem', color: '#333' }}>
-            {modelName || '晶体结构'} 显示选项
-          </h4>
-
-          <div>
-            <h5 style={{ color: '#555', fontWeight: 'bold', marginBottom: '0.5rem' }}>
-              <FaCubes style={{ marginRight: '5px', color: '#007bff' }} /> 显示风格
-            </h5>
-            <select
-              value={displayOptions.frameworkStyle}
-              onChange={(e) => handleOptionChange('frameworkStyle', e.target.value)}
-              style={{
-                width: '100%',
-                padding: '8px',
-                borderRadius: '5px',
-                border: '1px solid #ccc',
-                marginBottom: '1rem',
-              }}
-            >
-              <option value="wireframe">线框模式</option>
-              <option value="stick">棒状模式</option>
-              <option value="ballStick">球棒模型</option>
-            </select>
-          </div>
-
-          <div>
-            <h5 style={{ color: '#555', fontWeight: 'bold', marginBottom: '0.5rem' }}>
-              <FaRulerCombined style={{ marginRight: '5px', color: '#007bff' }} /> 深度渐变
-            </h5>
-            <select
-              value={displayOptions.depthFading}
-              onChange={(e) => handleOptionChange('depthFading', e.target.value)}
-              style={{
-                width: '100%',
-                padding: '8px',
-                borderRadius: '5px',
-                border: '1px solid #ccc',
-                marginBottom: '1rem',
-              }}
-            >
-              <option value="none">无</option>
-              <option value="light">浅</option>
-              <option value="medium">中</option>
-              <option value="strong">强</option>
-            </select>
-          </div>
-
-          <div>
-            <h5 style={{ color: '#555', fontWeight: 'bold', marginBottom: '0.5rem' }}>
-              <FaVectorSquare style={{ marginRight: '5px', color: '#007bff' }} /> 坐标轴
-            </h5>
-            <button
-              onClick={() => handleOptionChange('axes', !displayOptions.axes)}
-              style={{
-                width: '100%',
-                padding: '8px',
-                backgroundColor: displayOptions.axes ? '#007bff' : '#f0f0f0',
-                color: displayOptions.axes ? '#fff' : '#333',
-                borderRadius: '5px',
-                border: '1px solid #ccc',
-                cursor: 'pointer',
-              }}
-            >
-              {displayOptions.axes ? '隐藏坐标轴' : '显示坐标轴'}
-            </button>
-          </div>
         </div>
       </div>
     </div>

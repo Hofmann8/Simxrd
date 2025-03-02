@@ -1,11 +1,30 @@
 import React from 'react';
-import AppRouter from './router/AppRouter';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import Home from './pages/Home';
+import SimXRD from './pages/SimXRD';
+import ReferenceStructure from './pages/ReferenceStructure';
+import About from './pages/About';
+import Register from './pages/Register';
+import ConformationExplanation from './pages/ConformationExplanation';
 
 function App() {
   return (
-    <div className="App">
-      <AppRouter />
-    </div>
+    <Router>
+      <div className="App">
+        <Navbar />
+        <div className="app-layout">
+          <Routes>
+            <Route path="/" element={<SimXRD />} />
+            <Route path="/home" element={<Home />} />
+            <Route path="/reference-structure" element={<ReferenceStructure />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/conformation-explanation" element={<ConformationExplanation />} />
+          </Routes>
+        </div>
+      </div>
+    </Router>
   );
 }
 

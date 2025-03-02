@@ -1,134 +1,115 @@
 import React, { useEffect, useRef } from 'react';
 
-const CrystalStructureViewer = ({ filePath, displayOptions, saveViewerState, savedState }) => {
+const CrystalStructureViewer = ({ filePath, displayOptions, saveViewerState }) => {
   const viewerRef = useRef(null);
   const isElectron = window.electron !== undefined;
+  const jsmolInitializedRef = useRef(false);
 
+  // 初始化 JSmol
   useEffect(() => {
     if (!window.Jmol) {
-      console.error('JSmol 未加载。请确保 JSmol.min.js 和相关文件已正确包含。');
+      console.error('JSmol 库未加载');
       return;
     }
 
     const viewerContainer = viewerRef.current;
-
     if (!viewerContainer) {
-      console.error('查看器容器不可用。');
+      console.error('查看器容器不可用');
       return;
     }
 
     // 处理 Electron 环境下的文件路径
     let processedFilePath = filePath;
     if (isElectron && window.electronAPI) {
-      // 使用预加载脚本中暴露的 API 处理路径
       processedFilePath = window.electronAPI.convertFilePath(filePath);
       console.log('Electron 环境下的文件路径:', processedFilePath);
     }
 
-    const jsmolOptions = {
+    const jmolInfo = {
       width: '100%',
       height: '100%',
+      use: 'HTML5',
       j2sPath: isElectron && window.electronAPI ? window.electronAPI.getJsmolPath() : '/jsmol/j2s',
-      script: `load "${processedFilePath}"; display all;`,
-      disableInitialConsole: true, // 禁用初始控制台输出
-      use: 'HTML5',  // 强制使用 HTML5 渲染器
+      script: `set antialiasdisplay; set antialiasimages; background white; load "${processedFilePath}";`,
       disableJ2SLoadMonitor: true,
-      debug: isElectron // 在 Electron 中启用调试
-    };
+      disableInitialConsole: true,
+      allowJavaScript: true,
+      readyFunction: () => {
+        console.log('JSmol 已准备就绪');
+        jsmolInitializedRef.current = true;
 
-    let jsmolViewer;
-
-    const initJSmolViewer = () => {
-      try {
-        viewerContainer.innerHTML = ''; // 清空容器
-        jsmolViewer = window.Jmol.getApplet('jsmolViewer', jsmolOptions);
-
-        if (jsmolViewer) {
-          viewerContainer.innerHTML = window.Jmol.getAppletHtml(jsmolViewer);
-          
-          // 如果有保存的状态，恢复它
-          if (savedState && Object.keys(savedState).length > 0) {
-            setTimeout(() => {
-              window.Jmol.script(window.jsmolViewer, savedState.script || '');
-            }, 500);
-          }
-        } else {
-          console.error('无法生成 JSmol applet HTML。');
-        }
-      } catch (error) {
-        console.error('初始化 JSmol 查看器时出错:', error);
+        // 初始化完成后应用当前显示选项
+        applyDisplayOptions(displayOptions);
       }
     };
 
-    initJSmolViewer();
+    // 清除容器内容
+    viewerContainer.innerHTML = '';
+    jsmolInitializedRef.current = false;
 
-    return () => {
-      if (viewerContainer) {
-        viewerContainer.innerHTML = ''; // 防止内存泄漏
-      }
-    };
-  }, [filePath, isElectron, savedState]); // 初始化时依赖 filePath 和 isElectron
-
-  // 动态更新显示选项
-  useEffect(() => {
-    if (!window.Jmol || !viewerRef.current || !window.jsmolViewer) return;
-
-    const generateJmolScript = () => {
-      let script = '';
-
-      if (displayOptions.frameworkStyle === 'wireframe') {
-        script += 'wireframe only;';
-      } else if (displayOptions.frameworkStyle === 'stick') {
-        script += 'wireframe off; spacefill off; select all; wireframe 0.15;';
-      } else if (displayOptions.frameworkStyle === 'ballStick') {
-        script += 'wireframe off; spacefill 0.4; wireframe 0.15;';
-      }
-
-      if (displayOptions.depthFading === 'light') {
-        script += 'set zshade on; set zshadePower 1;';
-      } else if (displayOptions.depthFading === 'medium') {
-        script += 'set zshade on; set zshadePower 2;';
-      } else if (displayOptions.depthFading === 'strong') {
-        script += 'set zshade on; set zshadePower 3;';
-      } else {
-        script += 'set zshade off;';
-      }
-
-      if (displayOptions.unitCell) {
-        script += 'unitcell on;';
-      } else {
-        script += 'unitcell off;';
-      }
-
-      if (displayOptions.axes) {
-        script += 'axes on;';
-      } else {
-        script += 'axes off;';
-      }
-
-      // 保存当前状态
-      if (saveViewerState) {
-        saveViewerState({ script });
-      }
-
-      return script;
-    };
-
-    const script = generateJmolScript();
+    // 创建 JSmol 对象
     try {
-      window.Jmol.script(window.jsmolViewer, script); // 动态更新显示选项
+      const jmolHtml = window.Jmol.getAppletHtml("jmolApplet0", jmolInfo);
+
+      // 将 HTML 字符串插入到容器中
+      viewerContainer.innerHTML = jmolHtml;
     } catch (error) {
-      console.error('执行 JSmol 脚本时出错:', error);
+      console.error('JSmol 初始化错误:', error);
+      viewerContainer.innerHTML = `<div class="alert alert-danger">JSmol 初始化错误: ${error.message}</div>`;
     }
-  }, [displayOptions, saveViewerState]); // 每次 displayOptions 更新时调用
+
+    // 清理函数
+    return () => {
+      try {
+        if (window.jmolApplet0) {
+          const state = {
+            rotation: window.Jmol.evaluateVar(window.jmolApplet0, 'quaternion()'),
+            zoom: window.Jmol.evaluateVar(window.jmolApplet0, 'zoom'),
+            translation: window.Jmol.evaluateVar(window.jmolApplet0, 'translate()'),
+            slab: window.Jmol.evaluateVar(window.jmolApplet0, 'slab')
+          };
+          saveViewerState(state);
+        }
+      } catch (e) {
+        console.error('Error saving JSmol state:', e);
+      }
+    };
+  }, [filePath, isElectron, saveViewerState, displayOptions]);
+
+  // 应用显示选项的函数
+  const applyDisplayOptions = (options) => {
+    if (!window.jmolApplet0) return;
+
+    try {
+      // 应用显示风格
+      if (options.frameworkStyle === 'wireframe') {
+        window.Jmol.script(window.jmolApplet0, 'wireframe 0.1; spacefill 0%; color cpk;');
+      } else if (options.frameworkStyle === 'ballStick') {
+        window.Jmol.script(window.jmolApplet0, 'wireframe 0.15; spacefill 25%; color cpk;');
+      }
+
+      // 应用坐标轴 - 直接设置，不需要重新加载模型
+      if (options.axes) {
+        window.Jmol.script(window.jmolApplet0, 'axes on; axes 0.15; axes scale 2.0; color axes black;');
+      } else {
+        window.Jmol.script(window.jmolApplet0, 'axes off;');
+      }
+    } catch (error) {
+      console.error('应用显示选项错误:', error);
+    }
+  };
+
+  // 监听显示选项变化
+  useEffect(() => {
+    if (jsmolInitializedRef.current) {
+      applyDisplayOptions(displayOptions);
+    }
+  }, [displayOptions]);
 
   return (
-    <div 
-      ref={viewerRef} 
-      style={{ 
-        width: '100%', 
-        height: '100%',
-      }}
+    <div
+      ref={viewerRef}
+      style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }}
     />
   );
 };
