@@ -38,7 +38,7 @@ const CrystalStructureViewer = ({ filePath, displayOptions, saveViewerState }) =
     const initScript = `
       set antialiasdisplay true;
       set antialiasimages true;
-      background white;
+      background ${displayOptions.backgroundColor || 'white'};
       load "${processedFilePath}";
       
       # 设置高质量渲染
@@ -67,6 +67,13 @@ const CrystalStructureViewer = ({ filePath, displayOptions, saveViewerState }) =
       color axes black;
       font axes 14;
       axes off;
+      
+      # 设置光照效果
+      ${getLightingScript(displayOptions.lighting)}
+      
+      # 禁用右键菜单
+      set rightMouseAction ROTATE;
+      set allowContextMenu false;
     `;
 
     const jmolInfo = {
@@ -78,21 +85,23 @@ const CrystalStructureViewer = ({ filePath, displayOptions, saveViewerState }) =
       disableJ2SLoadMonitor: true,
       disableInitialConsole: true,
       allowJavaScript: true,
+      menuFile: null, // 禁用菜单
       readyFunction: () => {
         jsmolInitializedRef.current = true;
 
         // 应用初始显示选项
-        if (displayOptions.frameworkStyle === 'wireframe') {
-          window.Jmol.script(window.jmolApplet0, 'wireframe 0.1; spacefill 0%; color cpk;');
-        } else if (displayOptions.frameworkStyle === 'ballStick') {
-          window.Jmol.script(window.jmolApplet0, 'wireframe 0.15; spacefill 25%; color cpk;');
-        }
+        applyDisplayStyle(displayOptions.frameworkStyle);
         
         // 应用初始坐标轴设置
         if (displayOptions.showAxes) {
           window.Jmol.script(window.jmolApplet0, 'axes on;');
         } else {
           window.Jmol.script(window.jmolApplet0, 'axes off;');
+        }
+        
+        // 应用初始自旋设置
+        if (displayOptions.spinning) {
+          window.Jmol.script(window.jmolApplet0, 'spin on;');
         }
 
         // 保存初始选项
@@ -131,6 +140,58 @@ const CrystalStructureViewer = ({ filePath, displayOptions, saveViewerState }) =
     };
   }, [filePath, isElectron, saveViewerState, displayOptions]); 
 
+  // 获取光照效果脚本
+  const getLightingScript = (lighting) => {
+    switch(lighting) {
+      case 'soft':
+        return `
+          set ambientPercent 60;
+          set diffusePercent 70;
+          set specularPercent 30;
+          set specularPower 40;
+        `;
+      case 'sharp':
+        return `
+          set ambientPercent 30;
+          set diffusePercent 90;
+          set specularPercent 70;
+          set specularPower 100;
+        `;
+      case 'flat':
+        return `
+          set ambientPercent 80;
+          set diffusePercent 50;
+          set specularPercent 0;
+        `;
+      default: // 'default'
+        return `
+          set ambientPercent 45;
+          set diffusePercent 85;
+          set specularPercent 45;
+          set specularPower 80;
+        `;
+    }
+  };
+
+  // 应用显示风格
+  const applyDisplayStyle = (style) => {
+    if (!window.jmolApplet0) return;
+    
+    switch(style) {
+      case 'wireframe':
+        window.Jmol.script(window.jmolApplet0, 'wireframe 0.1; spacefill 0%; color cpk;');
+        break;
+      case 'ballStick':
+        window.Jmol.script(window.jmolApplet0, 'wireframe 0.15; spacefill 25%; color cpk;');
+        break;
+      case 'spacefill':
+        window.Jmol.script(window.jmolApplet0, 'wireframe off; spacefill 100%; color cpk;');
+        break;
+      default:
+        window.Jmol.script(window.jmolApplet0, 'wireframe 0.1; spacefill 0%; color cpk;');
+    }
+  };
+
   // 单独处理显示选项变化
   useEffect(() => {
     if (!jsmolInitializedRef.current || !window.jmolApplet0) return;
@@ -138,11 +199,7 @@ const CrystalStructureViewer = ({ filePath, displayOptions, saveViewerState }) =
     try {
       // 只有当显示风格变化时才更新
       if (prevOptionsRef.current.frameworkStyle !== displayOptions.frameworkStyle) {
-        if (displayOptions.frameworkStyle === 'wireframe') {
-          window.Jmol.script(window.jmolApplet0, 'wireframe 0.1; spacefill 0%; color cpk;');
-        } else if (displayOptions.frameworkStyle === 'ballStick') {
-          window.Jmol.script(window.jmolApplet0, 'wireframe 0.15; spacefill 25%; color cpk;');
-        }
+        applyDisplayStyle(displayOptions.frameworkStyle);
       }
       
       // 只有当坐标轴显示设置变化时才更新
@@ -152,6 +209,21 @@ const CrystalStructureViewer = ({ filePath, displayOptions, saveViewerState }) =
         } else {
           window.Jmol.script(window.jmolApplet0, 'axes off;');
         }
+      }
+      
+      // 只有当背景颜色变化时才更新
+      if (prevOptionsRef.current.backgroundColor !== displayOptions.backgroundColor) {
+        window.Jmol.script(window.jmolApplet0, `background ${displayOptions.backgroundColor};`);
+      }
+      
+      // 只有当光照效果变化时才更新
+      if (prevOptionsRef.current.lighting !== displayOptions.lighting) {
+        window.Jmol.script(window.jmolApplet0, getLightingScript(displayOptions.lighting));
+      }
+      
+      // 只有当自旋状态变化时才更新
+      if (prevOptionsRef.current.spinning !== displayOptions.spinning) {
+        window.Jmol.script(window.jmolApplet0, displayOptions.spinning ? 'spin on;' : 'spin off;');
       }
 
       // 更新之前的选项引用

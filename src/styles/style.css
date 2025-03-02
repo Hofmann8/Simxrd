@@ -21,7 +21,6 @@ input {
 }
 
 button {
-    width: 100%;
     padding: 10px;
     background-color: #4CAF50;
     color: white;
@@ -88,15 +87,18 @@ button:hover {
     opacity: 0;
     transform: scale(0.5);
 }
+
 .toolbar-transition-enter-active {
     opacity: 1;
     transform: scale(1);
     transition: transform 300ms ease, opacity 300ms ease;
 }
+
 .toolbar-transition-exit {
     opacity: 1;
     transform: scale(1);
 }
+
 .toolbar-transition-exit-active {
     opacity: 0;
     transform: scale(0.5);
@@ -125,4 +127,33 @@ button:hover {
 .App {
     min-height: 100vh;
 }
-  
+
+/* 为主体内容区域留出左侧Navbar的宽度 */
+.container-fluid.p-0 {
+    margin-left: 60px;
+    /* Navbar未展开时的宽度 */
+    width: calc(100% - 60px);
+    transition: margin-left 0.3s ease, width 0.3s ease;
+}
+
+/* 确保在Electron环境下正确显示 */
+body.electron-app .container-fluid.p-0 {
+    margin-top: 32px;
+    /* 标题栏高度 */
+}
+
+/* 确保Navbar在正确的位置 */
+.navbar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    z-index: 1000;
+}
+
+/* 确保在Electron环境下，Navbar位于标题栏下方 */
+body.electron-app .navbar {
+    top: 32px;
+    /* 标题栏高度 */
+    height: calc(100vh - 32px);
+}
