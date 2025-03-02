@@ -4,9 +4,19 @@ const CrystalStructureViewer = ({ filePath, displayOptions, saveViewerState }) =
   const viewerRef = useRef(null);
   const isElectron = window.electron !== undefined;
   const jsmolInitializedRef = useRef(false);
+  const prevOptionsRef = useRef(displayOptions);
+  const filePathRef = useRef(filePath);
 
-  // 初始化 JSmol
+  // 初始化 JSmol - 使用 useRef 来避免重复初始化
   useEffect(() => {
+    // 如果已经初始化了相同的文件，则不重新初始化
+    if (jsmolInitializedRef.current && filePathRef.current === filePath) {
+      return;
+    }
+    
+    // 更新当前文件路径引用
+    filePathRef.current = filePath;
+    
     if (!window.Jmol) {
       console.error('JSmol 库未加载');
       return;
@@ -22,24 +32,71 @@ const CrystalStructureViewer = ({ filePath, displayOptions, saveViewerState }) =
     let processedFilePath = filePath;
     if (isElectron && window.electronAPI) {
       processedFilePath = window.electronAPI.convertFilePath(filePath);
-      console.log('Electron 环境下的文件路径:', processedFilePath);
     }
+
+    // 初始化脚本 - 使用更高级的设置
+    const initScript = `
+      set antialiasdisplay true;
+      set antialiasimages true;
+      background white;
+      load "${processedFilePath}";
+      
+      # 设置高质量渲染
+      set highResolution true;
+      
+      # 优化显示
+      set perspectiveDepth true;
+      set ambientPercent 45;
+      set diffusePercent 85;
+      set specular true;
+      set specularPower 80;
+      set specularExponent 5;
+      set specularPercent 45;
+      
+      # 设置旋转行为
+      set navMode JMOL;
+      
+      # 优化性能
+      set wireframeRotation true;
+      set antialiasDisplay true;
+      
+      # 初始化坐标轴设置
+      set axesMode 1;
+      set axesScale 0.3;
+      set axesUnitCell;
+      color axes black;
+      font axes 14;
+      axes off;
+    `;
 
     const jmolInfo = {
       width: '100%',
       height: '100%',
       use: 'HTML5',
       j2sPath: isElectron && window.electronAPI ? window.electronAPI.getJsmolPath() : '/jsmol/j2s',
-      script: `set antialiasdisplay; set antialiasimages; background white; load "${processedFilePath}";`,
+      script: initScript,
       disableJ2SLoadMonitor: true,
       disableInitialConsole: true,
       allowJavaScript: true,
       readyFunction: () => {
-        console.log('JSmol 已准备就绪');
         jsmolInitializedRef.current = true;
 
-        // 初始化完成后应用当前显示选项
-        applyDisplayOptions(displayOptions);
+        // 应用初始显示选项
+        if (displayOptions.frameworkStyle === 'wireframe') {
+          window.Jmol.script(window.jmolApplet0, 'wireframe 0.1; spacefill 0%; color cpk;');
+        } else if (displayOptions.frameworkStyle === 'ballStick') {
+          window.Jmol.script(window.jmolApplet0, 'wireframe 0.15; spacefill 25%; color cpk;');
+        }
+        
+        // 应用初始坐标轴设置
+        if (displayOptions.showAxes) {
+          window.Jmol.script(window.jmolApplet0, 'axes on;');
+        } else {
+          window.Jmol.script(window.jmolApplet0, 'axes off;');
+        }
+
+        // 保存初始选项
+        prevOptionsRef.current = { ...displayOptions };
       }
     };
 
@@ -50,8 +107,6 @@ const CrystalStructureViewer = ({ filePath, displayOptions, saveViewerState }) =
     // 创建 JSmol 对象
     try {
       const jmolHtml = window.Jmol.getAppletHtml("jmolApplet0", jmolInfo);
-
-      // 将 HTML 字符串插入到容器中
       viewerContainer.innerHTML = jmolHtml;
     } catch (error) {
       console.error('JSmol 初始化错误:', error);
@@ -74,35 +129,35 @@ const CrystalStructureViewer = ({ filePath, displayOptions, saveViewerState }) =
         console.error('Error saving JSmol state:', e);
       }
     };
-  }, [filePath, isElectron, saveViewerState, displayOptions]);
+  }, [filePath, isElectron, saveViewerState, displayOptions]); 
 
-  // 应用显示选项的函数
-  const applyDisplayOptions = (options) => {
-    if (!window.jmolApplet0) return;
+  // 单独处理显示选项变化
+  useEffect(() => {
+    if (!jsmolInitializedRef.current || !window.jmolApplet0) return;
 
     try {
-      // 应用显示风格
-      if (options.frameworkStyle === 'wireframe') {
-        window.Jmol.script(window.jmolApplet0, 'wireframe 0.1; spacefill 0%; color cpk;');
-      } else if (options.frameworkStyle === 'ballStick') {
-        window.Jmol.script(window.jmolApplet0, 'wireframe 0.15; spacefill 25%; color cpk;');
+      // 只有当显示风格变化时才更新
+      if (prevOptionsRef.current.frameworkStyle !== displayOptions.frameworkStyle) {
+        if (displayOptions.frameworkStyle === 'wireframe') {
+          window.Jmol.script(window.jmolApplet0, 'wireframe 0.1; spacefill 0%; color cpk;');
+        } else if (displayOptions.frameworkStyle === 'ballStick') {
+          window.Jmol.script(window.jmolApplet0, 'wireframe 0.15; spacefill 25%; color cpk;');
+        }
+      }
+      
+      // 只有当坐标轴显示设置变化时才更新
+      if (prevOptionsRef.current.showAxes !== displayOptions.showAxes) {
+        if (displayOptions.showAxes) {
+          window.Jmol.script(window.jmolApplet0, 'axes on;');
+        } else {
+          window.Jmol.script(window.jmolApplet0, 'axes off;');
+        }
       }
 
-      // 应用坐标轴 - 直接设置，不需要重新加载模型
-      if (options.axes) {
-        window.Jmol.script(window.jmolApplet0, 'axes on; axes 0.15; axes scale 2.0; color axes black;');
-      } else {
-        window.Jmol.script(window.jmolApplet0, 'axes off;');
-      }
+      // 更新之前的选项引用
+      prevOptionsRef.current = { ...displayOptions };
     } catch (error) {
       console.error('应用显示选项错误:', error);
-    }
-  };
-
-  // 监听显示选项变化
-  useEffect(() => {
-    if (jsmolInitializedRef.current) {
-      applyDisplayOptions(displayOptions);
     }
   }, [displayOptions]);
 

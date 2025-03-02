@@ -1,19 +1,19 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FaCubes, FaVectorSquare } from 'react-icons/fa';
+import { FaCubes, FaRuler } from 'react-icons/fa';
 import CrystalStructureViewer from './CrystalStructureViewer';
 
 const CrystalStructureDisplay = ({ filePath, modelName }) => {
   const viewerStateRef = useRef({});
   const [displayOptions, setDisplayOptions] = useState({
     frameworkStyle: 'wireframe',
-    axes: false,
+    showAxes: false,
   });
 
   // 重置工具栏状态
   useEffect(() => {
     setDisplayOptions({
       frameworkStyle: 'wireframe',
-      axes: false,
+      showAxes: false,
     });
   }, [filePath]);
 
@@ -49,13 +49,13 @@ const CrystalStructureDisplay = ({ filePath, modelName }) => {
             </div>
             <div className="col-md-6">
               <label className="form-label d-flex align-items-center mb-1">
-                <FaVectorSquare className="me-2 text-primary" /> 坐标轴
+                <FaRuler className="me-2 text-primary" /> 坐标轴
               </label>
               <button
-                onClick={() => handleOptionChange('axes', !displayOptions.axes)}
-                className={`btn btn-sm w-100 ${displayOptions.axes ? 'btn-primary' : 'btn-outline-secondary'}`}
+                onClick={() => handleOptionChange('showAxes', !displayOptions.showAxes)}
+                className={`btn btn-sm w-100 ${displayOptions.showAxes ? 'btn-primary' : 'btn-outline-secondary'}`}
               >
-                {displayOptions.axes ? '隐藏坐标轴' : '显示坐标轴'}
+                {displayOptions.showAxes ? '隐藏坐标轴' : '显示坐标轴'}
               </button>
             </div>
           </div>
