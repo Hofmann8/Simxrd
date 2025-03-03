@@ -4,7 +4,7 @@ import { FaChartLine, FaCube, FaInfoCircle, FaArrowRight } from 'react-icons/fa'
 
 const Home = () => {
   return (
-    <div className="content">
+    <div className="content" style={{ marginLeft: '60px' }}>
       <div className="home-container">
         {/* 页面标题 */}
         <div className="page-header">

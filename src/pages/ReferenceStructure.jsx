@@ -1,14 +1,15 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import CrystalStructureDisplay from '../components/CrystalStructureDisplay';
-import { FaAtom, FaInfoCircle, FaCube } from 'react-icons/fa';
+import { FaCubes } from 'react-icons/fa';
 
 const ReferenceStructure = () => {
-  const [selectedModel, setSelectedModel] = useState(null);
+  const [selectedStructure, setSelectedStructure] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
   const [isElectron, setIsElectron] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  // 模型对应的文件路径和基本信息
-  const modelOptions = {
+  // 使用 useMemo 包装 modelOptions
+  const modelOptions = useMemo(() => ({
     FAU: {
       path: '/xyz_data/FAU.xyz',
       description: 'FAU型沸石是一种大孔沸石，具有三维孔道系统，常用于催化裂化和吸附分离。',
@@ -55,154 +56,163 @@ const ReferenceStructure = () => {
         applications: '小孔道限制了分子大小，多用于精细分离和特定催化反应'
       }
     },
-  };
+  }), []); // 空依赖数组，因为这些数据是静态的
 
-  // 使用 useCallback 包装 handleModelSelection 函数
-  const handleModelSelection = useCallback((model) => {
+  // 使用 useCallback 包装 handleStructureSelect 函数
+  const handleStructureSelect = useCallback((structure) => {
     setErrorMessage(''); // 清除之前的错误
 
     // 在 Electron 环境中检查文件是否存在
     if (isElectron && window.electronAPI) {
-      const fileExists = window.electronAPI.fileExists(modelOptions[model].path);
+      const fileExists = window.electronAPI.fileExists(modelOptions[structure].path);
       if (!fileExists) {
-        setErrorMessage(`文件 ${modelOptions[model].path} 不存在，请确保数据文件已正确安装。`);
+        setErrorMessage(`文件 ${modelOptions[structure].path} 不存在，请确保数据文件已正确安装。`);
         return;
       }
     }
 
-    setSelectedModel(model);
+    setSelectedStructure(structure);
+    setSelectedFile(modelOptions[structure].path);
   }, [isElectron, modelOptions]);
 
   useEffect(() => {
     // 检测是否在 Electron 环境中
     setIsElectron(window.electron !== undefined);
-
-    // 默认选择 LTA 结构
-    if (!selectedModel) {
-      handleModelSelection('LTA');
-    }
-  }, [handleModelSelection, selectedModel]);
+  }, []);  // 移除 handleStructureSelect 和 selectedStructure 依赖
 
   return (
-    <div className="container-fluid p-0">
-      {/* 现代化标题栏 */}
-      <div className="border-bottom shadow-sm py-2 px-3 d-flex align-items-center bg-white">
-        <div className="d-flex align-items-center">
-          <div className="me-3 d-flex align-items-center justify-content-center"
-            style={{ width: '40px', height: '40px', backgroundColor: '#f0f7ff', borderRadius: '8px' }}>
-            <FaCube size={20} className="text-primary" />
-          </div>
-          <h4 className="m-0 fw-normal text-dark">参考晶体结构</h4>
-        </div>
-      </div>
+    <div className="reference-structure-page" style={{ marginLeft: '60px', height: '100vh' }}>
+      <div className="container-fluid h-100 py-4">
+        <div className="row h-100">
+          {/* 左侧信息栏 - 设置高度100%并添加滚动 */}
+          <div className="col-md-4 h-100">
+            <div className="card h-100">
+              <div className="card-header bg-primary text-white">
+                <h5 className="card-title mb-0">晶体信息</h5>
+              </div>
+              <div className="card-body" style={{ overflowY: 'auto' }}>
+                {selectedStructure ? (
+                  <>
+                    <h6 className="text-primary mb-2 fw-normal">简要信息</h6>
+                    <p className="small text-muted mb-2">{modelOptions[selectedStructure].description}</p>
+                    <ul className="list-unstyled small">
+                      {modelOptions[selectedStructure].features.map((feature, index) => (
+                        <li key={index} className="mb-1 text-secondary">• {feature}</li>
+                      ))}
+                    </ul>
 
-      {/* 主要内容区域 */}
-      <div className="row m-0" style={{ height: 'calc(100vh - 60px)' }}>
-        {/* 左侧选择面板 */}
-        <div className="col-md-2 p-0 border-end" style={{ height: '100%', backgroundColor: '#f8f9fa' }}>
-          <div className="p-3 border-bottom">
-            <h6 className="m-0 text-secondary">选择结构类型</h6>
-          </div>
-          <div className="list-group list-group-flush border-0">
-            {Object.keys(modelOptions).map((model) => (
-              <button
-                key={model}
-                className={`list-group-item list-group-item-action border-0 d-flex align-items-center ${selectedModel === model ? 'active bg-primary text-white' : 'bg-transparent'
-                  }`}
-                onClick={() => handleModelSelection(model)}
-              >
-                <FaAtom className="me-2" /> {model}
-              </button>
-            ))}
-          </div>
+                    {/* 详细信息表格 */}
+                    <h6 className="text-primary mb-2 mt-4 fw-normal">详细信息</h6>
+                    <table className="table table-sm">
+                      <tbody>
+                        <tr>
+                          <th style={{ width: '30%' }} className="text-secondary">晶系</th>
+                          <td>{modelOptions[selectedStructure].detailedInfo.crystalSystem}</td>
+                        </tr>
+                        <tr>
+                          <th className="text-secondary">空间群</th>
+                          <td>{modelOptions[selectedStructure].detailedInfo.spaceGroup}</td>
+                        </tr>
+                        <tr>
+                          <th className="text-secondary">晶胞参数</th>
+                          <td>{modelOptions[selectedStructure].detailedInfo.cellParameters}</td>
+                        </tr>
+                        <tr>
+                          <th className="text-secondary">框架密度</th>
+                          <td>{modelOptions[selectedStructure].detailedInfo.frameworkDensity}</td>
+                        </tr>
+                      </tbody>
+                    </table>
 
-          {selectedModel && (
-            <div className="p-3">
-              <h6 className="mb-2 text-secondary">简要信息</h6>
-              <p className="small text-muted mb-2">{modelOptions[selectedModel].description}</p>
-              <ul className="list-unstyled small">
-                {modelOptions[selectedModel].features.map((feature, index) => (
-                  <li key={index} className="mb-1 text-secondary">• {feature}</li>
-                ))}
-              </ul>
+                    {/* 结构特征表格 */}
+                    <h6 className="text-primary mb-2 mt-4 fw-normal">结构特征</h6>
+                    <table className="table table-sm">
+                      <tbody>
+                        <tr>
+                          <th style={{ width: '30%' }} className="text-secondary">骨架结构</th>
+                          <td>{modelOptions[selectedStructure].detailedInfo.framework}</td>
+                        </tr>
+                        <tr>
+                          <th className="text-secondary">孔径尺寸</th>
+                          <td>{modelOptions[selectedStructure].detailedInfo.poreSize}</td>
+                        </tr>
+                        {modelOptions[selectedStructure].detailedInfo.supercage && (
+                          <tr>
+                            <th className="text-secondary">超笼尺寸</th>
+                            <td>{modelOptions[selectedStructure].detailedInfo.supercage}</td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+
+                    <h6 className="text-primary mb-2 mt-4 fw-normal">化学组成</h6>
+                    <p className="small">{modelOptions[selectedStructure].detailedInfo.composition}</p>
+
+                    <h6 className="text-primary mb-2 mt-4 fw-normal">主要应用</h6>
+                    <p className="small">{modelOptions[selectedStructure].detailedInfo.applications}</p>
+                  </>
+                ) : (
+                  <div className="text-center text-muted">
+                    <p>请选择一个晶体结构查看详细信息</p>
+                  </div>
+                )}
+              </div>
             </div>
-          )}
-        </div>
+          </div>
 
-        {/* 中间详细信息面板 */}
-        {selectedModel && (
-          <div className="col-md-3 p-0 border-end bg-white" style={{ height: '100%', overflowY: 'auto' }}>
-            <div className="p-3 border-bottom d-flex justify-content-between align-items-center">
-              <h5 className="m-0 fw-normal">{selectedModel} 详细信息</h5>
-              <FaInfoCircle className="text-primary" />
-            </div>
+          {/* 右侧内容区域 - 使用flex布局控制高度 */}
+          <div className="col-md-8 h-100">
+            <div className="d-flex flex-column h-100">
+              {/* 右上方横向结构选择栏 */}
+              <div className="card mb-3">
+                <div className="card-body py-2">
+                  <div className="d-flex gap-2">
+                    {Object.keys(modelOptions).map((structure) => (
+                      <button
+                        key={structure}
+                        className={`btn ${selectedStructure === structure
+                          ? 'btn-primary'
+                          : 'btn-outline-primary'
+                        }`}
+                        onClick={() => handleStructureSelect(structure)}
+                      >
+                        {structure}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
 
-            <div className="p-3">
-              <h6 className="text-primary mb-2 fw-normal">基本晶体学参数</h6>
-              <table className="table table-sm">
-                <tbody>
-                  <tr>
-                    <th style={{ width: '30%' }} className="text-secondary">晶系</th>
-                    <td>{modelOptions[selectedModel].detailedInfo.crystalSystem}</td>
-                  </tr>
-                  <tr>
-                    <th className="text-secondary">空间群</th>
-                    <td>{modelOptions[selectedModel].detailedInfo.spaceGroup}</td>
-                  </tr>
-                  <tr>
-                    <th className="text-secondary">晶胞参数</th>
-                    <td>{modelOptions[selectedModel].detailedInfo.cellParameters}</td>
-                  </tr>
-                  <tr>
-                    <th className="text-secondary">框架密度</th>
-                    <td>{modelOptions[selectedModel].detailedInfo.frameworkDensity}</td>
-                  </tr>
-                </tbody>
-              </table>
-
-              <h6 className="text-primary mb-2 mt-4 fw-normal">结构特征</h6>
-              <table className="table table-sm">
-                <tbody>
-                  <tr>
-                    <th style={{ width: '30%' }} className="text-secondary">骨架结构</th>
-                    <td>{modelOptions[selectedModel].detailedInfo.framework}</td>
-                  </tr>
-                  <tr>
-                    <th className="text-secondary">孔径尺寸</th>
-                    <td>{modelOptions[selectedModel].detailedInfo.poreSize}</td>
-                  </tr>
-                  {modelOptions[selectedModel].detailedInfo.supercage && (
-                    <tr>
-                      <th className="text-secondary">超笼尺寸</th>
-                      <td>{modelOptions[selectedModel].detailedInfo.supercage}</td>
-                    </tr>
+              {/* 右下方渲染区域 - 占据剩余空间 */}
+              <div className="card flex-grow-1">
+                <div className="card-body p-0 h-100">
+                  {selectedStructure ? (
+                    <div className="h-100" style={{ position: 'relative' }}>
+                      {errorMessage && (
+                        <div className="alert alert-danger m-3">
+                          {errorMessage}
+                        </div>
+                      )}
+                      <CrystalStructureDisplay
+                        filePath={selectedFile}
+                        modelName={selectedStructure}
+                      />
+                    </div>
+                  ) : (
+                    <div className="d-flex flex-column align-items-center justify-content-center h-100 p-4">
+                      <div className="mb-4">
+                        <FaCubes size={64} className="text-muted" />
+                      </div>
+                      <h4 className="text-muted mb-3">请选择晶体结构</h4>
+                      <p className="text-muted">
+                        从上方选择一个晶体结构以查看3D模型
+                      </p>
+                    </div>
                   )}
-                </tbody>
-              </table>
-
-              <h6 className="text-primary mb-2 mt-4 fw-normal">化学组成</h6>
-              <p>{modelOptions[selectedModel].detailedInfo.composition}</p>
-
-              <h6 className="text-primary mb-2 mt-4 fw-normal">主要应用</h6>
-              <p>{modelOptions[selectedModel].detailedInfo.applications}</p>
+                </div>
+              </div>
             </div>
           </div>
-        )}
-
-        {/* 右侧 JSmol 显示区域 */}
-        <div className={`col-md-${selectedModel ? '7' : '10'} p-0`} style={{ height: '100%' }}>
-          {errorMessage && (
-            <div className="alert alert-danger m-3">
-              {errorMessage}
-            </div>
-          )}
-
-          {selectedModel && (
-            <CrystalStructureDisplay
-              filePath={modelOptions[selectedModel].path}
-              modelName={selectedModel}
-            />
-          )}
         </div>
       </div>
     </div>
