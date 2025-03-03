@@ -1,76 +1,49 @@
 import React from 'react';
-import { FaPlay, FaPause, FaRedo, FaCog } from 'react-icons/fa';
+import { BsPlayFill, BsPauseFill, BsArrowCounterclockwise, BsLightningFill } from 'react-icons/bs';
+import './ToolBar.css';
 
 const ToolBar = ({ onSpeedChange, currentSpeed, onGenerate, onPause, isPaused, onReset }) => {
-  const handleSpeedChange = (e) => {
-    const newSpeed = Number(e.target.value);
-    onSpeedChange(newSpeed);
-  };
-
-  const buttonStyle = {
-    height: '32px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '4px',
-    fontSize: '14px'
-  };
-
-  const smallButtonStyle = {
-    ...buttonStyle,
-    width: '80px',
-  };
-
-  const largeButtonStyle = {
-    ...buttonStyle,
-    width: '168px',  // 两个小按钮的宽度加间距
-  };
-
   return (
-    <div className="tool-bar bg-light p-3 rounded shadow-sm">
-      <div className="d-flex flex-column gap-2">
-        <div className="d-flex justify-content-between">
-          <button 
-            className="btn btn-outline-primary"
-            onClick={onPause}
-            title={isPaused ? "继续" : "暂停"}
-            style={smallButtonStyle}
-          >
-            {isPaused ? <FaPlay size={12} /> : <FaPause size={12} />}
-            {isPaused ? "继续" : "暂停"}
-          </button>
-          <button 
-            className="btn btn-outline-secondary"
-            onClick={onReset}
-            title="重置"
-            style={smallButtonStyle}
-          >
-            <FaRedo size={12} /> 重置
-          </button>
+    <div className="toolbar-container">
+      {/* 左侧速度控制 */}
+      <div className="speed-control">
+        <div className="speed-display">
+          <span>{currentSpeed}x</span>
         </div>
-        <button 
-          className="btn btn-success w-100"
-          onClick={onGenerate}
-          title="一键生成"
-          style={largeButtonStyle}
-        >
-          <FaCog size={12} /> 一键生成
-        </button>
+        <div className="slider-container">
+          <input
+            type="range"
+            className="custom-range"
+            min="0.5"
+            max="5"
+            step="0.5"
+            value={currentSpeed}
+            onChange={(e) => onSpeedChange(parseFloat(e.target.value))}
+          />
+        </div>
       </div>
-      
-      <div className="speed-control mt-3">
-        <label className="form-label d-flex justify-content-between align-items-center">
-          <span>模拟速度</span>
-          <span className="badge bg-primary rounded-pill">{currentSpeed}x</span>
-        </label>
-        <input
-          type="range"
-          className="form-range"
-          min="1"
-          max="16"
-          value={currentSpeed}
-          onChange={handleSpeedChange}
-        />
+
+      {/* 右侧控制按钮 */}
+      <div className="control-buttons">
+        <button
+          className={`control-btn ${isPaused ? 'active' : ''}`}
+          onClick={onPause}
+        >
+          {isPaused ? <BsPlayFill size={18} /> : <BsPauseFill size={18} />}
+        </button>
+        <button
+          className="control-btn"
+          onClick={onReset}
+        >
+          <BsArrowCounterclockwise size={16} />
+        </button>
+        <button
+          className="generate-btn"
+          onClick={onGenerate}
+        >
+          <BsLightningFill size={14} />
+          <span>一键生成</span>
+        </button>
       </div>
     </div>
   );

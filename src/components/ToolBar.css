@@ -1,0 +1,150 @@
+.toolbar-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 40px;
+  padding: 0 4px;
+}
+
+/* 速度控制区域 */
+.speed-control {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 240px;
+}
+
+.speed-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 32px;
+  background-color: white;
+  border: 1px solid #dee2e6;
+  border-radius: 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #0d6efd;
+}
+
+.slider-container {
+  flex: 1;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  padding: 0 2px; /* 添加内边距避免滑块溢出 */
+}
+
+/* 自定义滑块样式 */
+.custom-range {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: #e9ecef;
+  outline: none;
+  padding: 0;
+  margin: 0;
+}
+
+.custom-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #0d6efd;
+  border: 2px solid white;
+  box-shadow: 0 0 0 1px #0d6efd;
+  cursor: pointer;
+  margin-top: -6px;
+  transition: all 0.2s ease;
+}
+
+.custom-range::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+}
+
+.custom-range:focus::-webkit-slider-thumb {
+  box-shadow: 0 0 0 1px #0d6efd, 0 0 0 3px rgba(13, 110, 253, 0.25);
+}
+
+/* 控制按钮区域 */
+.control-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.control-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #dee2e6;
+  border-radius: 50%;
+  background-color: white;
+  color: #6c757d;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.control-btn:hover {
+  background-color: #f8f9fa;
+  border-color: #c1c9d0;
+  color: #495057;
+}
+
+.control-btn.active {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+  color: white;
+}
+
+.generate-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 6px;
+  background-color: #0d6efd;
+  color: white;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.generate-btn:hover {
+  background-color: #0b5ed7;
+}
+
+.control-btn:active,
+.generate-btn:active {
+  transform: scale(0.95);
+}
+
+/* 按钮悬停效果 */
+.btn-light:hover {
+  background-color: #f8f9fa;
+  border-color: #dee2e6;
+}
+
+.btn-primary:hover {
+  background-color: #0b5ed7;
+}
+
+/* 圆形按钮过渡效果 */
+.btn {
+  transition: all 0.2s ease;
+}
+
+.btn:active {
+  transform: scale(0.95);
+}
+
+/* 速度显示框样式 */
+.rounded-pill {
+  font-size: 14px;
+}

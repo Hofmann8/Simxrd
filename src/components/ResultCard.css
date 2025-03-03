@@ -71,10 +71,8 @@
 /* 添加图表容器的样式 */
 .chart-container {
   position: relative;
-  background: white;
-  border-radius: 8px;
-  padding: 20px;
-  margin-top: 20px;
+  height: 100%;
+  width: 100%;
 }
 
 /* 添加动画效果 */
@@ -107,5 +105,84 @@
   opacity: 0;
   max-height: 0;
   transition: all 300ms ease-out;
+}
+
+.echarts-for-react {
+  height: 100% !important;
+}
+
+/* 工具栏样式 */
+.toolbar {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* 详情区域样式 */
+.details-area {
+  background: rgba(255, 255, 255, 0.98);
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .details-area .row {
+    flex-direction: column;
+  }
+  
+  .details-area .col-md-6 {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+}
+
+/* 使用更高优先级的选择器覆盖 Bootstrap alert 的默认边距 */
+.d-flex .alert.alert-success,
+.d-flex .alert.alert-info,
+.d-flex .alert.alert-warning,
+.d-flex .alert.alert-danger {
+  margin: 0 !important;  /* 使用 !important 确保覆盖 */
+  padding: 0.25rem 0.5rem;  /* 减小内边距使其更紧凑 */
+}
+
+/* 调整 badge 的间距 */
+.badge.me-2 {
+  margin-right: 0.5rem !important;
+}
+
+/* 匹配度标签样式 */
+.match-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  margin-right: 8px;
+}
+
+.match-perfect {
+  background-color: #e6f7e6;
+  color: #52c41a;
+  border: 1px solid #b7eb8f;
+}
+
+.match-high {
+  background-color: #e6f7ff;
+  color: #1890ff;
+  border: 1px solid #91d5ff;
+}
+
+.match-partial {
+  background-color: #fff7e6;
+  color: #fa8c16;
+  border: 1px solid #ffd591;
+}
+
+.match-low {
+  background-color: #fff1f0;
+  color: #f5222d;
+  border: 1px solid #ffa39e;
 }
   

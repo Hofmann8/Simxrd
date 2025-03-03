@@ -1,23 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import ReactECharts from 'echarts-for-react';
 import ToolBar from './ToolBar';
-import { FaChevronDown, FaChevronUp, FaTools } from 'react-icons/fa';
-import { CSSTransition } from 'react-transition-group';
 import './ResultCard.css';
 
 const ResultCard = ({ resultData }) => {
-  const [showDetails, setShowDetails] = useState(false);
-  const [showToolbar, setShowToolbar] = useState(false);  // 默认不展开工具栏
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [speed, setSpeed] = useState(1);
   const [isPaused, setIsPaused] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   // 当 resultData 改变时重置状态
   useEffect(() => {
     setCurrentIndex(0);
     setIsPaused(false);
     setSpeed(1);
-  }, [resultData.source]); // 使用 source 作为依赖，因为它能唯一标识数据集
+  }, [resultData.source]);
 
   // 动画效果
   useEffect(() => {
@@ -71,12 +67,12 @@ const ResultCard = ({ resultData }) => {
       };
     }
 
-    // 计算当前显示数据的范围
-    const currentData = resultData.data.slice(0, currentIndex + 1);
+    // 使用 currentIndex 来控制数据显示
+    const displayData = resultData.data.slice(0, currentIndex + 1);
     
     // 确保数据格式正确
-    if (!currentData.every(point => '2THETA' in point && 'Cnt2_D1' in point)) {
-      console.error('Invalid data format:', currentData);
+    if (!displayData.every(point => '2THETA' in point && 'Cnt2_D1' in point)) {
+      console.error('Invalid data format:', displayData);
       return {
         title: {
           text: '数据格式错误',
@@ -87,12 +83,12 @@ const ResultCard = ({ resultData }) => {
     }
 
     // 计算当前数据的范围，并添加一些边距
-    const currentXValues = currentData.map(point => point['2THETA']);
+    const currentXValues = displayData.map(point => point['2THETA']);
     const minX = Math.max(5, Math.min(...currentXValues) - 2);
     const maxX = Math.min(50, Math.max(...currentXValues) + 2);
     
     // 计算Y轴范围
-    const currentYValues = currentData.map(point => point['Cnt2_D1']);
+    const currentYValues = displayData.map(point => point['Cnt2_D1']);
     const maxY = Math.max(...currentYValues) * 1.1; // 留出10%的顶部空间
 
     // 计算最大值的位数来调整左边距
@@ -102,10 +98,10 @@ const ResultCard = ({ resultData }) => {
     return {
       animation: false,
       grid: {
-        top: 50,
-        right: 60,
-        bottom: 50,
-        left: leftPadding,  // 动态调整左边距
+        top: 40,        // 减小顶部边距
+        right: 20,      // 减小右边距
+        bottom: 40,     // 减小底部边距
+        left: 60,       // 减小左边距，但保持足够空间显示坐标值
         containLabel: true
       },
       tooltip: {
@@ -121,7 +117,7 @@ const ResultCard = ({ resultData }) => {
         type: 'value',
         name: '2θ (°)',
         nameLocation: 'center',
-        nameGap: 35,
+        nameGap: 25,    // 减小名称与轴的距离
         min: minX,
         max: maxX,
         splitLine: {
@@ -129,15 +125,15 @@ const ResultCard = ({ resultData }) => {
           lineStyle: { type: 'dashed' }
         },
         axisLabel: {
-          margin: 12,
-          formatter: (value) => value.toFixed(2)
+          margin: 8,    // 减小标签与轴的距离
+          formatter: (value) => value.toFixed(1)  // 减少小数位数
         }
       },
       yAxis: {
         type: 'value',
         name: '强度',
         nameLocation: 'center',
-        nameGap: 55,  // 增加名称与轴的距离
+        nameGap: 35,    // 减小名称与轴的距离
         min: 0,
         max: maxY,
         splitLine: {
@@ -145,19 +141,22 @@ const ResultCard = ({ resultData }) => {
           lineStyle: { type: 'dashed' }
         },
         axisLabel: {
-          margin: 16,  // 增加标签与轴的距离
-          formatter: (value) => value.toFixed(2),
-          align: 'right'  // 确保数字右对齐
+          margin: 8,    // 减小标签与轴的距离
+          formatter: (value) => {
+            // 对于大数值，使用科学计数法
+            if (value >= 1000) {
+              return value.toExponential(1);
+            }
+            return value.toFixed(0);  // 整数显示
+          },
+          align: 'right'
         }
       },
       series: [{
         type: 'line',
         showSymbol: false,
         clip: true,
-        data: currentData.map(point => [
-          point['2THETA'],
-          point['Cnt2_D1']
-        ]),
+        data: displayData.map(item => [item['2THETA'], item['Cnt2_D1']]),
         lineStyle: {
           width: 2,
           color: '#1890ff'
@@ -186,25 +185,25 @@ const ResultCard = ({ resultData }) => {
   const getMatchingStyle = (similarity) => {
     if (similarity >= 95) {
       return {
-        className: "alert alert-success",
+        className: "match-tag match-perfect",
         icon: "✓",
         text: "完全匹配"
       };
     } else if (similarity >= 85) {
       return {
-        className: "alert alert-info",
+        className: "match-tag match-high",
         icon: "★",
         text: "高度匹配"
       };
     } else if (similarity >= 70) {
       return {
-        className: "alert alert-warning",
+        className: "match-tag match-partial",
         icon: "○",
         text: "部分匹配"
       };
     } else {
       return {
-        className: "alert alert-danger",
+        className: "match-tag match-low",
         icon: "⚠",
         text: "低度匹配"
       };
@@ -212,89 +211,74 @@ const ResultCard = ({ resultData }) => {
   };
 
   return (
-    <div className="card mt-4">
-      <div className="card-body p-0">
-        {/* 工具栏切换按钮 */}
-        <div className="position-absolute" style={{ right: '15px', top: '15px', zIndex: 1000 }}>
-          <button 
-            className="btn btn-sm btn-outline-secondary"
-            onClick={() => setShowToolbar(!showToolbar)}
-            title={showToolbar ? "隐藏工具栏" : "显示工具栏"}
-          >
-            <FaTools />
-          </button>
-        </div>
-
-        {/* 图表区域 */}
-        <div style={{ height: '400px', position: 'relative' }}>
-          <ReactECharts 
-            option={getChartOptions()} 
-            style={{ height: '100%', width: '100%' }}
-            notMerge={true}
-            lazyUpdate={false}
-          />
+    <div className="d-flex flex-column h-100">
+      {/* 顶部区域 */}
+      <div className="border-bottom">
+        {/* 标题和基本信息 */}
+        <div className="d-flex justify-content-between align-items-center p-3">
+          <div className="d-flex align-items-center gap-3">
+            <h5 className="mb-0">XRD 模拟结果</h5>
+            {resultData.similarity !== undefined && (
+              <div className="d-flex align-items-center bg-light rounded px-3 py-2">
+                <span className={`${getMatchingStyle(resultData.similarity).className} me-2`}>
+                  {getMatchingStyle(resultData.similarity).icon}
+                </span>
+                <span className="text-muted">
+                  匹配度: <strong>{resultData.similarity.toFixed(1)}%</strong>
+                </span>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* 工具栏 */}
-        <CSSTransition
-          in={showToolbar}
-          timeout={300}
-          classNames="toolbar"
-          unmountOnExit
-        >
-          <div className="border-top">
-            <ToolBar
-              onSpeedChange={handleSpeedChange}
-              currentSpeed={speed}
-              onGenerate={handleGenerate}
-              onPause={handlePause}
-              isPaused={isPaused}
-              onReset={handleReset}
-            />
-          </div>
-        </CSSTransition>
+        <div className="bg-light px-3 py-2 border-top">
+          <ToolBar
+            onSpeedChange={handleSpeedChange}
+            currentSpeed={speed}
+            onGenerate={handleGenerate}
+            onPause={handlePause}
+            isPaused={isPaused}
+            onReset={handleReset}
+          />
+        </div>
+      </div>
 
-        {/* 展开/收起按钮 */}
-        <div 
-          className="text-center py-2 border-top" 
-          style={{ cursor: 'pointer' }}
-          onClick={() => setShowDetails(!showDetails)}
-        >
-          {showDetails ? <FaChevronUp /> : <FaChevronDown />}
+      {/* 主要内容区域 */}
+      <div className="d-flex flex-grow-1">
+        {/* 左侧图表 */}
+        <div className="flex-grow-1 p-3">
+          <ReactECharts
+            option={getChartOptions()}
+            style={{ height: '100%', width: '100%' }}
+            notMerge={true}
+          />
         </div>
 
-        {/* 详细信息区域 */}
-        {showDetails && (
-          <div className="p-3 border-top">
-            {resultData.similarity !== undefined && (
-              <div className={getMatchingStyle(resultData.similarity).className}>
-                <div className="d-flex align-items-center">
-                  <span className="me-2" style={{ fontSize: '1.2em' }}>
-                    {getMatchingStyle(resultData.similarity).icon}
-                  </span>
-                  <div>
-                    <strong>{getMatchingStyle(resultData.similarity).text}</strong>
-                    <div>匹配度: {resultData.similarity.toFixed(1)}%</div>
-                  </div>
-                </div>
-              </div>
-            )}
-            <div className="row">
-              <div className="col-md-6">
-                <h6>分析结果:</h6>
-                <p>{resultData.result}</p>
-              </div>
-              <div className="col-md-6">
-                <img 
-                  src={resultData.img} 
-                  alt="XRD Result" 
-                  className="img-fluid"
-                  style={{ maxHeight: '300px' }}
-                />
-              </div>
+        {/* 右侧信息栏 */}
+        <div className="border-start" style={{ width: '260px' }}>
+          <div className="p-3">
+            <h6 className="text-primary mb-3">分析结果</h6>
+            <p className="small text-muted mb-4">{resultData.result}</p>
+
+            <h6 className="text-primary mb-3">参考图谱</h6>
+            <img 
+              src={resultData.img} 
+              alt="XRD Result" 
+              className="img-fluid mb-3"
+              style={{ maxWidth: '100%' }}
+            />
+
+            <div className="small text-muted mt-3">
+              <div className="fw-bold mb-2">匹配详情</div>
+              <p>{getMatchingStyle(resultData.similarity).text}</p>
+              <ul className="list-unstyled">
+                <li>• 匹配度：{resultData.similarity.toFixed(1)}%</li>
+                <li>• 数据源：{resultData.source}</li>
+              </ul>
             </div>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

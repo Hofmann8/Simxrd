@@ -2,7 +2,7 @@ import { FaFlask, FaThermometerHalf, FaClock } from 'react-icons/fa';
 
 export const formFields = {
   sio2: {
-    label: 'SiO₂/Al₂O₃ 比例',
+    label: 'SiO₂/Al₂O₃',
     icon: <FaFlask />,
     min: 0,
     max: 10,
@@ -10,7 +10,7 @@ export const formFields = {
     tooltip: '硅铝比影响沸石的骨架结构'
   },
   na2o: {
-    label: 'Na₂O/SiO₂ 比例',
+    label: 'Na₂O/SiO₂',
     icon: <FaFlask />,
     min: 0,
     max: 10,
@@ -18,7 +18,7 @@ export const formFields = {
     tooltip: '钠硅比影响结晶度'
   },
   h2o: {
-    label: 'H₂O/SiO₂ 比例',
+    label: 'H₂O/SiO₂',
     icon: <FaFlask />,
     min: 0,
     max: 25,
