@@ -1,10 +1,7 @@
-/* Navbar 样式 */
+/* Navbar 基础样式 */
 .navbar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    height: 100vh;
-    width: 60px; /* 最小宽度 */
+    height: 100%;
+    width: 60px;
     background-color: #f8f9fa;
     box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.1);
     display: flex;
@@ -13,39 +10,36 @@
     transition: width 0.3s ease;
     overflow: hidden;
     z-index: 1000;
+    flex-shrink: 0;
+    border-right: 1px solid #e9ecef;
 }
 
 /* 鼠标悬停时展开 */
 .navbar:hover,
 .navbar.expanded {
-    width: 240px; /* 展开宽度 */
+    width: 240px;
 }
 
-/* 确保在Electron环境下，Navbar位于标题栏下方 */
-body.electron-app .navbar {
-    top: 32px; /* 标题栏高度 */
-    height: calc(100vh - 32px);
-}
-
-/* 顶部标题区域容器，使用 min-height 避免跳动 */
+/* 顶部标题区域容器 */
 .navbar-header-container {
     flex-shrink: 0;
-    min-height: 80px; /* 固定最小高度 */
+    min-height: 80px;
     display: flex;
     justify-content: center;
     align-items: center;
     width: 100%;
 }
 
-/* 按钮列表容器，垂直居中按钮 */
+/* 导航按钮容器 */
 .navbar-buttons-container {
     flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: center; /* 垂直居中对齐 */
+    justify-content: center;
     width: 100%;
 }
 
+/* 导航列表 */
 .navbar ul {
     list-style: none;
     padding: 0;
@@ -56,24 +50,23 @@ body.electron-app .navbar {
     align-items: center;
 }
 
-/* 每个按钮项的样式 */
+/* 导航项 */
 .navbar li {
     width: 100%;
-    height: 60px; /* 固定高度避免跳动 */
+    height: 60px;
     display: flex;
     align-items: center;
-    justify-content: center; /* 收起时居中对齐 */
+    justify-content: center;
     margin-bottom: 10px;
     transition: padding 0.3s ease;
 }
 
-/* 展开时左对齐，并增加 padding-left */
 .navbar:hover li {
     justify-content: flex-start;
     padding-left: 20px;
 }
 
-/* 按钮链接的样式 */
+/* 导航链接 */
 .navbar li a {
     text-decoration: none;
     color: #333;
@@ -83,29 +76,26 @@ body.electron-app .navbar {
     transition: color 0.3s ease;
 }
 
-/* 图标样式 */
 .navbar li a svg {
     margin-right: 10px;
 }
 
-/* 初始状态下完全隐藏文字 */
+.navbar li.active a {
+    color: #007bff;
+}
+
+/* 文字提示 */
 .navbar li a .tooltip-text {
     display: none;
 }
 
-/* 鼠标悬停时显示文字 */
 .navbar:hover li a .tooltip-text {
     display: inline;
     white-space: nowrap;
     margin-left: 10px;
 }
 
-/* 激活状态下的按钮 */
-.navbar li.active a {
-    color: #007bff;
-}
-
-/* 版权信息相关样式 */
+/* 底部版权信息 */
 .navbar-footer {
     width: 100%;
     padding: 10px 5px;
@@ -132,7 +122,7 @@ body.electron-app .navbar {
     line-height: 1.2;
 }
 
-/* 收起状态的样式 */
+/* 版权信息展开/收起状态 */
 .copyright-year {
     display: block;
 }
@@ -149,7 +139,6 @@ body.electron-app .navbar {
     color: #888;
 }
 
-/* 展开状态的样式 */
 .navbar:hover .copyright-year,
 .navbar:hover .copyright-name {
     display: inline;
@@ -162,10 +151,4 @@ body.electron-app .navbar {
 
 .navbar:hover .license-text {
     display: block;
-}
-
-/* 删除不需要的样式 */
-.data-source,
-.navbar:hover .data-source {
-    display: none;
 }

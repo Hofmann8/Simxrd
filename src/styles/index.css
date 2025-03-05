@@ -1,128 +1,137 @@
 /* 基础样式重置 */
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 html,
 body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    /* 隐藏主体滚动条 */
-    overflow: hidden;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  /* 隐藏主体滚动条 */
+  overflow: hidden;
+  border-radius: 12px;
+  /* 整体圆角 */
+  background: transparent;
 }
 
 body {
-    position: relative;
-    /* 始终保留滚动条空间，防止布局弹跳 */
-    overflow-x: hidden;
-    overflow-y: scroll;
+  position: relative;
+  /* 始终保留滚动条空间，防止布局弹跳 */
+  overflow-x: hidden;
+  overflow-y: scroll;
 }
 
 /* 当内容超出时才显示滚动条 */
 html.has-scroll body {
-    /* 当内容需要滚动时，这个规则不再需要 */
+  /* 当内容需要滚动时，这个规则不再需要 */
 }
 
 #root {
-    width: 100%;
-    height: 100%;
-    position: relative;
+  width: 100%;
+  height: 100%;
+  position: relative;
 }
 
 /* 应用布局容器 */
 .app-layout {
-    width: calc(100%); /* 减去导航栏宽度 */
-    height: 100%;
-    position: relative;
-    overflow: hidden;
+  width: calc(100%);
+  /* 减去导航栏宽度 */
+  height: 100%;
+  position: relative;
+  overflow: hidden;
 }
 
 /* 内容区域 */
 .content {
-    width: 100%;
-    height: 100%;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding: 20px;
-    position: relative;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 20px;
+  position: relative;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
 }
 
 /* 现代化滚动条样式 - 更精致的设计 */
 /* Webkit浏览器 (Chrome, Safari, Edge等) */
 ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-    background: transparent;
-    border-radius: 10px;
+  background: transparent;
+  border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.15);
-    border-radius: 10px;
-    transition: all 0.3s ease;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+  transition: all 0.3s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.25);
+  background: rgba(0, 0, 0, 0.25);
 }
 
 ::-webkit-scrollbar-corner {
-    background: transparent;
+  background: transparent;
 }
 
 /* Firefox浏览器 */
 * {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
 }
 
 /* 对于需要单独滚动的容器 */
 .scrollable-container {
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding-right: 6px;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
 }
 
 /* 为CrystalStructureViewer组件添加滚动容器样式 */
 .crystal-structure-container {
-    height: 100%;
-    width: 100%;
-    overflow: hidden; /* 防止整体溢出 */
-    display: flex;
-    flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  /* 防止整体溢出 */
+  display: flex;
+  flex-direction: column;
 }
 
 /* 确保工具栏不会溢出 */
 .crystal-structure-container .bg-light {
-    flex-shrink: 0; /* 防止工具栏被压缩 */
-    overflow-x: auto; /* 在小屏幕上允许水平滚动 */
-    min-height: 80px; /* 确保有足够的高度 */
+  flex-shrink: 0;
+  /* 防止工具栏被压缩 */
+  overflow-x: auto;
+  /* 在小屏幕上允许水平滚动 */
+  min-height: 80px;
+  /* 确保有足够的高度 */
 }
 
 /* JSmol 查看器容器 */
 .crystal-structure-container .flex-grow-1 {
-    height: calc(100% - 80px); /* 减去工具栏高度 */
-    overflow: hidden;
+  height: calc(100% - 80px);
+  /* 减去工具栏高度 */
+  overflow: hidden;
 }
 
 /* 滚动条在悬停时的动画效果 */
 @media (hover: hover) {
-    ::-webkit-scrollbar-thumb {
-        opacity: 0.5;
-    }
+  ::-webkit-scrollbar-thumb {
+    opacity: 0.5;
+  }
 
-    *:hover::-webkit-scrollbar-thumb {
-        opacity: 1;
-    }
+  *:hover::-webkit-scrollbar-thumb {
+    opacity: 1;
+  }
 }
 
 /* 现代化页面标题样式 - 修复冲突 */
@@ -131,7 +140,8 @@ html.has-scroll body {
   justify-content: space-between;
   align-items: center;
   padding-bottom: 15px;
-  margin-bottom: 20px; /* 移除 !important */
+  margin-bottom: 20px;
+  /* 移除 !important */
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   position: relative;
   width: 100%;
@@ -180,7 +190,8 @@ html.has-scroll body {
   cursor: pointer;
   margin-left: auto;
   flex-shrink: 0;
-  width: auto; /* 覆盖 style.css 中的 width: 100% */
+  width: auto;
+  /* 覆盖 style.css 中的 width: 100% */
 }
 
 .content .info-button:hover {
@@ -216,10 +227,11 @@ html.has-scroll body {
 }
 
 /* 确保内容在动画过程中不会溢出 */
-.content > div {
+.content>div {
   max-width: 100%;
   overflow-x: hidden;
-  padding-right: 6px; /* 为滚动条预留空间 */
+  padding-right: 6px;
+  /* 为滚动条预留空间 */
 }
 
 /* 首页样式 */
@@ -333,21 +345,21 @@ html.has-scroll body {
   .feature-cards {
     grid-template-columns: 1fr;
   }
-  
+
   .welcome-section {
     padding: 20px;
   }
 }
 
 /* 确保所有内容容器都有一致的滚动行为 */
-.content > div,
+.content>div,
 .reference-structure-container,
 .home-container,
 .about-container,
 .conformation-explanation-container {
   max-width: 100%;
   overflow-x: hidden;
-  padding-right: 6px; /* 为滚动条预留空间 */
+  /* 为滚动条预留空间 */
 }
 
 /* 确保卡片内容区域的滚动行为一致 */
@@ -424,6 +436,7 @@ html.has-scroll body {
     opacity: 0;
     transform: translateY(-20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -452,15 +465,15 @@ html.has-scroll body {
   .crystal-detail-content {
     max-width: 95%;
   }
-  
+
   .crystal-detail-body {
     padding: 15px;
   }
-  
+
   .crystal-detail-body .row {
     flex-direction: column;
   }
-  
+
   .crystal-detail-body .col-md-6 {
     width: 100%;
     margin-bottom: 20px;
@@ -496,4 +509,273 @@ html.has-scroll body {
 /* 确保卡片内容有足够的间距 */
 .reference-structure-container .card-body {
   padding: 1.25rem;
+}
+
+/* 根容器样式 */
+.app-wrapper {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: transparent;
+  border-radius: 12px;
+  /* 移除整体的拖拽属性 */
+  /* -webkit-app-region: drag; */
+}
+
+/* 给整个应用添加现代化渐变边框 */
+.app-wrapper::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  /* 整体圆角 */
+  padding: 1px;
+  /* 渐变边框厚度 */
+  background: linear-gradient(to bottom right,
+      rgba(255, 255, 255, 0.2),
+      rgba(255, 255, 255, 0.1));
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* 主内容区域 */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  margin-right: 12px;
+  /* 默认状态下的右侧间距 */
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  position: relative;
+  -webkit-app-region: no-drag;
+}
+
+/* 最大化状态下移除右侧间距 */
+.title-bar[data-maximized="true"]~.main-content {
+  margin-right: 0;
+}
+
+/* 最大化状态下移除圆角 */
+.title-bar[data-maximized="true"],
+.title-bar[data-maximized="true"]~.main-content {
+  border-radius: 0;
+}
+
+/* 最大化状态下的窗口边框 */
+.app-wrapper[data-maximized="true"] {
+  border-radius: 0;
+}
+
+.app-wrapper[data-maximized="true"]::before {
+  border-radius: 0;
+}
+
+/* 标题栏样式 */
+.title-bar {
+  height: 48px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #495057;
+  position: relative;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  -webkit-app-region: drag;
+  /* 只让标题栏可拖拽 */
+}
+
+.title-text {
+  flex: 1;
+  padding-left: 16px;
+}
+
+/* 控制按钮容器 */
+.test-shape {
+  position: relative;
+  width: 138px;
+  /* 改回原来的宽度，容纳三个按钮 */
+  height: 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 4px;
+  margin-right: -8px;
+  -webkit-app-region: no-drag;
+}
+
+/* 测试按钮 */
+.test-button {
+  width: 46px;
+  height: 32px;
+  position: relative;
+  cursor: pointer;
+  background-color: transparent;
+  border: none;
+  outline: none;
+  -webkit-app-region: no-drag;
+  /* 确保按钮可点击 */
+}
+
+/* 最小化按钮 */
+.test-button.minimize::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 1px;
+  background-color: #000;
+}
+
+/* 关闭按钮 */
+.test-button.close::before,
+.test-button.close::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 1px;
+  background-color: #000;
+}
+
+.test-button.close::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.test-button.close::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+/* 悬停效果 */
+.test-button:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.test-button.close:hover {
+  background-color: #e81123;
+}
+
+.test-button.close:hover::before,
+.test-button.close:hover::after {
+  background-color: white;
+}
+
+/* 图标样式 */
+.test-button svg {
+  width: 10px;
+  height: 10px;
+  pointer-events: none;
+}
+
+/* 最小化按钮图标位置调整 */
+.test-button.minimize svg {
+  margin-top: 4px;
+}
+
+/* Router 容器样式 */
+.main-content>div {
+  display: flex;
+  width: 100%;
+  height: calc(100% - 48px);
+  /* 减去标题栏高度 */
+}
+
+/* 应用容器 */
+.app-container {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  flex-direction: column;
+}
+
+
+/* 导航栏调整 */
+.navbar {
+  border-right: 1px solid #e9ecef;
+}
+
+/* 调整滚动条样式 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Electron 应用特定样式 */
+body.electron-app {
+  background: transparent;
+  /* 确保背景透明 */
+}
+
+body.electron-app .app-wrapper {
+  height: 100vh;
+  background: transparent;
+}
+
+body.electron-app .main-content {
+  height: calc(100vh - 48px);
+  margin: 8px;
+}
+
+/* 最大化按钮 */
+.test-button.maximize::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 10px;
+  border: 1px solid #000;
+}
+
+/* 最大化状态下的按钮样式 */
+.title-bar[data-maximized="true"] .test-button.maximize::before {
+  width: 8px;
+  height: 8px;
+  border: 1px solid #000;
+  margin-top: -2px;
+  margin-left: 2px;
+}
+
+.title-bar[data-maximized="true"] .test-button.maximize::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border: 1px solid #000;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin-top: 2px;
+  margin-left: -2px;
 }

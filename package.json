@@ -33,8 +33,11 @@
     "test": "react-scripts test",
     "lint": "eslint src --ext .js,.jsx,.ts,.tsx",
     "coverage": "npm run test -- --watchAll=false --coverage",
-    "electron:dev": "electron . dev",
-    "electron": "electron . dev",
+    "electron-dev": "concurrently \"cross-env BROWSER=none npm start || true\" \"wait-on -v http://localhost:3000 && cross-env NODE_ENV=development electron . dev\"",
+    "electron-prod": "npm run build && electron .",
+    "electron": "npm run electron-dev",
+    "kill-port": "npx kill-port 3000",
+    "electron-dev-clean": "npm run kill-port && npm run electron-dev",
     "build:wasm": "cd wasm/xrd_core && compile.bat",
     "eject": "react-scripts eject"
   },
@@ -59,9 +62,13 @@
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@testing-library/react": "^12.1.5",
+    "concurrently": "^9.1.2",
+    "cross-env": "^7.0.3",
     "electron": "^33.0.1",
     "electron-devtools-installer": "^3.2.0",
-    "react-app-rewired": "^2.2.1"
+    "react-app-rewired": "^2.2.1",
+    "wait-on": "^8.0.2",
+    "kill-port": "^2.0.1"
   },
   "jest": {
     "transform": {

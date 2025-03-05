@@ -1,3 +1,25 @@
+/* NavbarHeader 容器 */
+.navbar-header-container {
+    position: relative;
+    flex-shrink: 0;
+    min-height: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+/* 透明遮罩层 */
+.header-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10;
+    cursor: pointer;
+}
+
 /* NavbarHeader 样式 */
 .navbar-header {
     padding-top: 20px;
@@ -9,6 +31,7 @@
     display: flex;
     align-items: center; /* 垂直居中 */
     justify-content: center; /* 水平居中 */
+    user-select: none;
 }
 
 .navbar-logo {
@@ -88,4 +111,11 @@
     100% {
         left: 100%;
     }
+}
+
+.logo {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
 }
