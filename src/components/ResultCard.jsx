@@ -57,7 +57,6 @@ const ResultCard = ({ resultData }) => {
   const getChartOptions = () => {
     // 验证数据
     if (!resultData?.data || !Array.isArray(resultData.data) || !resultData.data.length) {
-      console.error('Invalid or empty data:', resultData);
       return {
         title: {
           text: '数据加载失败',
@@ -67,12 +66,9 @@ const ResultCard = ({ resultData }) => {
       };
     }
 
-    // 使用 currentIndex 来控制数据显示
     const displayData = resultData.data.slice(0, currentIndex + 1);
-    
-    // 确保数据格式正确
+
     if (!displayData.every(point => '2THETA' in point && 'Cnt2_D1' in point)) {
-      console.error('Invalid data format:', displayData);
       return {
         title: {
           text: '数据格式错误',
@@ -82,34 +78,40 @@ const ResultCard = ({ resultData }) => {
       };
     }
 
-    // 计算当前数据的范围，并添加一些边距
     const currentXValues = displayData.map(point => point['2THETA']);
-    const minX = Math.max(5, Math.min(...currentXValues) - 2);
-    const maxX = Math.min(50, Math.max(...currentXValues) + 2);
-    
-    // 计算Y轴范围
     const currentYValues = displayData.map(point => point['Cnt2_D1']);
-    const maxY = Math.max(...currentYValues) * 1.1; // 留出10%的顶部空间
-
-    // 计算最大值的位数来调整左边距
-    const maxDigits = Math.floor(maxY).toString().length;
-    const leftPadding = Math.max(70, 40 + maxDigits * 10); // 基础边距40，每位数字增加10px
+    const minX = Math.min(...currentXValues);
+    const maxX = Math.max(...currentXValues);
+    const maxY = Math.max(...currentYValues);
 
     return {
       animation: false,
+      backgroundColor: '#ffffff',
       grid: {
-        top: 40,        // 减小顶部边距
-        right: 20,      // 减小右边距
-        bottom: 40,     // 减小底部边距
-        left: 60,       // 减小左边距，但保持足够空间显示坐标值
+        top: 60,
+        right: 40,
+        bottom: 60,
+        left: 70,
         containLabel: true
+      },
+      title: {
+        text: 'XRD 衍射图谱',
+        left: 'center',
+        top: 10,
+        textStyle: {
+          fontSize: 16,
+          fontWeight: 'normal'
+        }
       },
       tooltip: {
         trigger: 'axis',
         axisPointer: {
-          type: 'cross'
+          type: 'cross',
+          label: {
+            backgroundColor: '#6a7985'
+          }
         },
-        formatter: function(params) {
+        formatter: function (params) {
           return `2θ: ${params[0].data[0].toFixed(2)}°<br/>强度: ${params[0].data[1].toFixed(2)}`;
         }
       },
@@ -117,48 +119,66 @@ const ResultCard = ({ resultData }) => {
         type: 'value',
         name: '2θ (°)',
         nameLocation: 'center',
-        nameGap: 25,    // 减小名称与轴的距离
+        nameGap: 35,
         min: minX,
         max: maxX,
         splitLine: {
           show: true,
-          lineStyle: { type: 'dashed' }
+          lineStyle: {
+            color: '#E0E0E0',
+            type: 'dashed'
+          }
+        },
+        axisLine: {
+          show: true,
+          lineStyle: {
+            color: '#333'
+          }
         },
         axisLabel: {
-          margin: 8,    // 减小标签与轴的距离
-          formatter: (value) => value.toFixed(1)  // 减少小数位数
+          formatter: (value) => value.toFixed(2) + '°',
+          margin: 12
         }
       },
       yAxis: {
         type: 'value',
-        name: '强度',
+        name: '强度 (cps)',
         nameLocation: 'center',
-        nameGap: 35,    // 减小名称与轴的距离
+        nameGap: 45,
         min: 0,
-        max: maxY,
+        max: maxY * 1.1,
         splitLine: {
           show: true,
-          lineStyle: { type: 'dashed' }
+          lineStyle: {
+            color: '#E0E0E0',
+            type: 'dashed'
+          }
+        },
+        axisLine: {
+          show: true,
+          lineStyle: {
+            color: '#333'
+          }
         },
         axisLabel: {
-          margin: 8,    // 减小标签与轴的距离
-          formatter: (value) => {
-            // 对于大数值，使用科学计数法
+          formatter: function (value) {
             if (value >= 1000) {
-              return value.toExponential(1);
+              return `${(value / 1000).toFixed(2)}k`;
             }
-            return value.toFixed(0);  // 整数显示
+            return value.toFixed(2);
           },
-          align: 'right'
+          margin: 12
         }
       },
       series: [{
+        name: '衍射强度',
         type: 'line',
+        sampling: 'lttb',
         showSymbol: false,
         clip: true,
         data: displayData.map(item => [item['2THETA'], item['Cnt2_D1']]),
         lineStyle: {
-          width: 2,
+          width: 1.5,
           color: '#1890ff'
         },
         areaStyle: {
@@ -170,12 +190,16 @@ const ResultCard = ({ resultData }) => {
             y2: 1,
             colorStops: [{
               offset: 0,
-              color: 'rgba(24,144,255,0.3)'
+              color: 'rgba(24,144,255,0.25)'
             }, {
               offset: 1,
-              color: 'rgba(24,144,255,0.1)'
+              color: 'rgba(24,144,255,0.05)'
             }]
           }
+        },
+        emphasis: {
+          focus: 'series',
+          blurScope: 'coordinateSystem'
         }
       }]
     };
@@ -262,9 +286,9 @@ const ResultCard = ({ resultData }) => {
             <p className="small text-muted mb-4">{resultData.result}</p>
 
             <h6 className="text-primary mb-3">参考图谱</h6>
-            <img 
-              src={resultData.img} 
-              alt="XRD Result" 
+            <img
+              src={resultData.img}
+              alt="XRD Result"
               className="img-fluid mb-3"
               style={{ maxWidth: '100%' }}
             />

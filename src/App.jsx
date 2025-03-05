@@ -6,7 +6,6 @@ import SimXRD from './pages/SimXRD';
 import ReferenceStructure from './pages/ReferenceStructure';
 import About from './pages/About';
 import Register from './pages/Register';
-import ConformationExplanation from './pages/ConformationExplanation';
 
 function App() {
   return (
@@ -20,7 +19,6 @@ function App() {
             <Route path="/reference-structure" element={<ReferenceStructure />} />
             <Route path="/about" element={<About />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/conformation-explanation" element={<ConformationExplanation />} />
           </Routes>
         </div>
       </div>
