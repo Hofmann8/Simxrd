@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FaFlask, FaCubes, FaInfoCircle, FaHome } from 'react-icons/fa';
+import { FaHome, FaFlask, FaCubes, FaInfoCircle } from 'react-icons/fa';
 import NavbarHeader from './NavbarHeader';
 import './Navbar.css';
 
@@ -16,6 +16,12 @@ const Navbar = () => {
         <ul>
           <li className={location.pathname === "/" ? "active" : ""}>
             <Link to="/">
+              <FaHome size={24} />
+              <span className="tooltip-text">首页</span>
+            </Link>
+          </li>
+          <li className={location.pathname === "/sim-xrd" ? "active" : ""}>
+            <Link to="/sim-xrd">
               <FaFlask size={24} />
               <span className="tooltip-text">XRD模拟</span>
             </Link>
@@ -30,12 +36,6 @@ const Navbar = () => {
             <Link to="/about">
               <FaInfoCircle size={24} />
               <span className="tooltip-text">其他信息</span>
-            </Link>
-          </li>
-          <li className={location.pathname === "/home" ? "active" : ""}>
-            <Link to="/home">
-              <FaHome size={24} />
-              <span className="tooltip-text">首页</span>
             </Link>
           </li>
         </ul>

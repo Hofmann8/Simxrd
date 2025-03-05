@@ -1,73 +1,79 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { FaChartLine, FaCube, FaInfoCircle, FaArrowRight } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import { FaFlask, FaCubes, FaInfoCircle, FaChartLine } from 'react-icons/fa';
+import './Home.css';
 
 const Home = () => {
+  const navigate = useNavigate();
+
+  const features = [
+    {
+      icon: <FaFlask />,
+      title: 'XRD模拟',
+      description: '基于机器学习的XRD谱图模拟系统',
+      path: '/sim-xrd',
+      color: 'linear-gradient(135deg, #0ea5e9, #38bdf8)'
+    },
+    {
+      icon: <FaCubes />,
+      title: '参考晶体结构',
+      description: '3D交互式晶体结构展示',
+      path: '/reference-structure',
+      color: 'linear-gradient(135deg, #f43f5e, #fb7185)'
+    },
+    {
+      icon: <FaChartLine />,
+      title: '数据分析',
+      description: '实验数据可视化与分析',
+      path: '/sim-xrd',
+      color: 'linear-gradient(135deg, #059669, #34d399)'
+    },
+    {
+      icon: <FaInfoCircle />,
+      title: '其他信息',
+      description: '关于项目的更多信息',
+      path: '/about',
+      color: 'linear-gradient(135deg, #6366f1, #818cf8)'
+    }
+  ];
+
   return (
-    <div className="content" style={{ marginLeft: '60px' }}>
-      <div className="home-container">
-        {/* 页面标题 */}
-        <div className="page-header">
-          <div className="page-title">
-            <div className="page-icon">
-              <FaChartLine />
-            </div>
-            <h2>XRD模拟与晶体结构分析</h2>
-          </div>
-        </div>
-
-        {/* 欢迎信息 */}
-        <div className="welcome-section">
-          <h3>欢迎使用XRD模拟分析工具</h3>
-          <p>
-            本工具提供X射线衍射(XRD)模拟和晶体结构可视化功能，帮助研究人员更好地理解材料结构特性。
-            通过简单的参数设置，您可以快速获得高质量的XRD模拟图谱，并查看典型晶体结构的三维模型。
+    <div className="home-container">
+      <div className="home-content">
+        {/* 左侧标题区域 */}
+        <div
+          className="title-section"
+        >
+          <h1 className="main-title">
+            Sim<span className="highlight">X</span>RD
+          </h1>
+          <p className="subtitle">
+            基于机器学习的XRD谱图模拟与分析平台
           </p>
+          <button
+            className="cta-button"
+            onClick={() => navigate('/sim-xrd')}
+          >
+            开始使用
+          </button>
         </div>
 
-        {/* 功能卡片区域 */}
-        <div className="feature-cards">
-          {/* XRD模拟卡片 */}
-          <div className="feature-card">
-            <div className="feature-icon">
-              <FaChartLine />
+        {/* 右侧功能卡片区域 */}
+        <div className="features-grid">
+          {features.map((feature, index) => (
+            <div
+              key={index}
+              className="feature-card"
+              style={{ background: feature.color }}
+              onClick={() => navigate(feature.path)}
+            >
+              <div className="feature-icon">{feature.icon}</div>
+              <div className="feature-text">
+                <h3 className="feature-title">{feature.title}</h3>
+                <p className="feature-description">{feature.description}</p>
+              </div>
             </div>
-            <div className="feature-content">
-              <h4>XRD模拟</h4>
-              <p>通过设置晶体参数，模拟生成X射线衍射图谱，支持多种晶体结构和参数调整。</p>
-              <Link to="/" className="feature-link">
-                开始使用 <FaArrowRight />
-              </Link>
-            </div>
-          </div>
-
-          {/* 参考晶体结构卡片 */}
-          <div className="feature-card">
-            <div className="feature-icon">
-              <FaCube />
-            </div>
-            <div className="feature-content">
-              <h4>参考晶体结构</h4>
-              <p>查看典型晶体结构的三维模型，了解不同晶体的结构特征和空间排布。</p>
-              <Link to="/reference-structure" className="feature-link">
-                查看结构 <FaArrowRight />
-              </Link>
-            </div>
-          </div>
-
-          {/* 关于项目卡片 */}
-          <div className="feature-card">
-            <div className="feature-icon">
-              <FaInfoCircle />
-            </div>
-            <div className="feature-content">
-              <h4>关于项目</h4>
-              <p>了解本项目的开发背景、技术实现和使用指南，获取更多帮助信息。</p>
-              <Link to="/about" className="feature-link">
-                了解更多 <FaArrowRight />
-              </Link>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </div>

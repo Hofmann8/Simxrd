@@ -4,11 +4,11 @@ import { formFields } from '../config/formConfig';
 
 const XRDForm = ({ onSubmit, suggestions }) => {
   const [formData, setFormData] = useState({
-    sio2: 3,
-    na2o: 2,
-    h2o: 10,
-    time: 3,
-    temperature: 90,
+    sio2: 3.0,
+    na2o: 2.0,
+    h2o: 10.0,
+    time: 3.0,
+    temperature: 90.0,
   });
 
   const handleChange = (e) => {
@@ -16,11 +16,13 @@ const XRDForm = ({ onSubmit, suggestions }) => {
     setFormData((prevData) => ({ ...prevData, [id]: Number(value) }));
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSubmit(formData);
+  };
+
   return (
-    <form onSubmit={(e) => {
-      e.preventDefault();
-      onSubmit(formData);
-    }}>
+    <form onSubmit={handleSubmit}>
       <h2 className="text-center mb-4">实验参数设置</h2>
       <div className="row g-4">
         {Object.entries(formFields).map(([key, field]) => (
@@ -29,7 +31,7 @@ const XRDForm = ({ onSubmit, suggestions }) => {
               <label className="d-flex align-items-center mb-2">
                 <span className="me-2">{field.icon}</span>
                 {field.label}
-                <span 
+                <span
                   className="ms-2"
                   style={{ cursor: 'help' }}
                   title={field.tooltip}
@@ -48,12 +50,38 @@ const XRDForm = ({ onSubmit, suggestions }) => {
                   max={field.max}
                   step={field.step}
                   required
-                  style={{ width: '100px' }}
                 />
+                <div className="input-group-text">
+                  {key === 'time' ? 'h' : key === 'temperature' ? '°C' : ''}
+                </div>
+                {field.specialValues && (
+                  <select
+                    className="form-select"
+                    style={{ maxWidth: '100px' }}
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        handleChange({
+                          target: {
+                            id: key,
+                            value: e.target.value
+                          }
+                        });
+                      }
+                    }}
+                    value={field.specialValues.some(sv => sv.value === formData[key]) ? formData[key] : ''}
+                  >
+                    <option value="">特殊值</option>
+                    {field.specialValues.map(sv => (
+                      <option key={sv.value} value={sv.value}>
+                        {sv.label}
+                      </option>
+                    ))}
+                  </select>
+                )}
               </div>
               <div className="position-relative mt-2">
                 {suggestions && suggestions[key] && (
-                  <div 
+                  <div
                     className="suggestion-range"
                     style={{
                       position: 'absolute',

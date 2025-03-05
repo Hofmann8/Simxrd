@@ -33,11 +33,10 @@ html.has-scroll body {
 
 /* 应用布局容器 */
 .app-layout {
-    width: calc(100% - 80px); /* 减去导航栏宽度 */
+    width: calc(100%); /* 减去导航栏宽度 */
     height: 100%;
     position: relative;
     overflow: hidden;
-    margin-left: 80px; /* 为导航栏留出空间 */
 }
 
 /* 内容区域 */

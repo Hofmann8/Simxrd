@@ -15,7 +15,6 @@ label {
 input {
     width: 100%;
     padding: 8px;
-    margin-bottom: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
 }
@@ -107,9 +106,8 @@ button:hover {
 
 /* 页面容器样式 */
 .page-container {
-    max-width: calc(100% - 80px);
-    margin-left: 80px;
-    box-sizing: border-box;
+    max-width: 100%;
+    padding: 20px;
 }
 
 .navbar {
@@ -130,10 +128,8 @@ button:hover {
 
 /* 为主体内容区域留出左侧Navbar的宽度 */
 .container-fluid.p-0 {
-    margin-left: 60px;
-    /* Navbar未展开时的宽度 */
-    width: calc(100% - 60px);
-    transition: margin-left 0.3s ease, width 0.3s ease;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 /* 确保在Electron环境下正确显示 */
@@ -155,5 +151,63 @@ body.electron-app .container-fluid.p-0 {
 body.electron-app .navbar {
     top: 32px;
     /* 标题栏高度 */
+    height: calc(100vh - 32px);
+}
+
+/* 删除或修改之前的 margin-left 相关样式 */
+.app-content {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    /* 删除 margin-left */
+}
+
+.app-layout {
+    flex: 1;
+    overflow-y: auto;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* 确保 Electron 环境下的布局正确 */
+body.electron-app .app-content {
+    height: calc(100vh - 32px);
+    /* 32px 是标题栏高度 */
+    margin-top: 32px;
+    /* 删除 margin-left */
+}
+
+/* 如果有其他页面特定的样式，也需要删除 margin-left */
+.home-container,
+.reference-structure-container,
+.about-container,
+.sim-xrd-container {
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    /* 删除 margin-left */
+}
+
+/* Navbar 相关样式保持不变 */
+.navbar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 60px;
+    z-index: 1000;
+}
+
+/* 内容区域使用 padding-left 来避免被 Navbar 遮挡 */
+.app-container {
+    padding-left: 60px;
+    /* 与 Navbar 宽度相同 */
+    width: 100%;
+    min-height: 100vh;
+}
+
+/* Electron 环境下的标题栏适配 */
+body.electron-app .navbar {
+    top: 32px;
     height: calc(100vh - 32px);
 }

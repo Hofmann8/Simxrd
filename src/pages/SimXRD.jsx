@@ -106,7 +106,7 @@ const SimXRD = () => {
   };
 
   return (
-    <div className="simxrd-page" style={{ marginLeft: '60px', height: '100vh' }}>
+    <div className="simxrd-page" style={{height: '100vh' }}>
       <div className="container-fluid h-100 py-4">
         <div className="row h-100">
           {/* 左侧参数设置区域 */}
