@@ -38,4 +38,38 @@ const fetchSlidesByPresentationId = async (presentationId) => {
   return presentation.slides;
 }
 
-export { fetchPresentations, savePresentationsToServer, fetchPresentationById, fetchSlidesByPresentationId };
+const fetchXRDData = async (id) => {
+  try {
+    const response = await fetch('/final_merged_data.json');
+    const data = await response.json();
+
+    // 从 final_merged_data.json 中查找对应 id 的数据
+    const xrdInfo = data.find(item => item.id === id);
+    if (!xrdInfo) {
+      throw new Error('XRD data not found');
+    }
+
+    // 加载对应的 XRD 数据文件
+    const dataResponse = await fetch(`/xrd_data/${xrdInfo.data}`);
+    const xrdData = await dataResponse.json();
+
+    return {
+      data: xrdData,
+      img: `/xrd_images/${xrdInfo.img}`,
+      result: xrdInfo.result,
+      source: xrdInfo.source,
+      metadata: {
+        sio2: xrdInfo.sio2,
+        na2o: xrdInfo.na2o,
+        h2o: xrdInfo.h2o,
+        time: xrdInfo.time,
+        temperature: xrdInfo.temperature
+      }
+    };
+  } catch (error) {
+    console.error('Failed to fetch XRD data:', error);
+    throw error;
+  }
+};
+
+export { fetchPresentations, savePresentationsToServer, fetchPresentationById, fetchSlidesByPresentationId, fetchXRDData };

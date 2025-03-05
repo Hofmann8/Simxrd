@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as echarts from 'echarts';
 
-const XRDChart = ({ data, speed, instantGenerate }) => {
+const XRDChart = ({ dataPath, speed, instantGenerate }) => {
   const chartRef = useRef(null);
   const indexRef = useRef(0);
   const storedDataRef = useRef([]);
@@ -33,7 +33,7 @@ const XRDChart = ({ data, speed, instantGenerate }) => {
           name: 'Angle (2θ)',
           nameLocation: 'center',
           nameGap: 25,
-          min: data.length > 0 ? data[0]["2THETA"] : 0,
+          min: dataPath ? data[0]["2THETA"] : 0,
         },
         yAxis: { 
           type: 'value', 
@@ -73,7 +73,7 @@ const XRDChart = ({ data, speed, instantGenerate }) => {
         chartRef.current.dispose();
       }
     };
-  }, [data]);
+  }, [dataPath]);
 
   // 清除动画函数
   const clearAnimationTimeout = () => {
@@ -87,7 +87,7 @@ const XRDChart = ({ data, speed, instantGenerate }) => {
   useEffect(() => {
     if (instantGenerate) {
       chartRef.current.setOption({
-        series: [{ data: data.map((point) => [point["2THETA"], point["Cnt2_D1"]]) }],
+        series: [{ data: dataPath ? data.map((point) => [point["2THETA"], point["Cnt2_D1"]]) : [] }],
       });
       setIsInstantRender(true);
     } else if (!isInstantRender) {
@@ -95,9 +95,9 @@ const XRDChart = ({ data, speed, instantGenerate }) => {
       let index = indexRef.current;
 
       const animateData = () => {
-        if (index >= data.length) return;
+        if (index >= dataPath ? data.length : 0) return;
 
-        const newPoint = [data[index]["2THETA"], data[index]["Cnt2_D1"]];
+        const newPoint = [dataPath ? data[index]["2THETA"] : 0, dataPath ? data[index]["Cnt2_D1"] : 0];
         storedDataRef.current = [...storedDataRef.current, newPoint];
         chartRef.current.setOption({
           series: [{ data: storedDataRef.current }],
@@ -112,7 +112,24 @@ const XRDChart = ({ data, speed, instantGenerate }) => {
     }
 
     return () => clearAnimationTimeout();
-  }, [data, speed, instantGenerate, isInstantRender]);
+  }, [dataPath, speed, instantGenerate, isInstantRender]);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const response = await fetch(dataPath);
+        const data = await response.json();
+        // 处理数据逻辑
+        // ... existing code ...
+      } catch (error) {
+        console.error('Error loading XRD data:', error);
+      }
+    };
+
+    if (dataPath) {
+      loadData();
+    }
+  }, [dataPath]);
 
   return <div id="xrd-chart" style={{ width: '100%', height: '400px', minHeight: '400px' }} />;
 };

@@ -4,6 +4,7 @@ import ResultCard from '../components/ResultCard';
 import XRDProcessor from '../utils/XRDProcessor';
 import { formFields } from '../config/formConfig';
 import { FaChartLine } from 'react-icons/fa';
+import { fetchXRDData } from '../api/ApiPresentations';
 
 const processor = new XRDProcessor();
 
@@ -14,7 +15,7 @@ const SimXRD = () => {
 
   useEffect(() => {
     // 加载数据源
-    fetch('/data.json')
+    fetch('/final_merged_data.json')
       .then(response => response.json())
       .then(data => setDataSource(data))
       .catch(error => console.error('Error loading data:', error));
@@ -29,17 +30,17 @@ const SimXRD = () => {
         const suggestedRanges = {};
         const parameters = Object.keys(formFields);
         let hasAnySuggestion = false;
-        
+
         // 为每个参数计算可行区间
         for (const param of parameters) {
           const testPoints = [];
           const step = (formFields[param].max - formFields[param].min) / 50;
-          
+
           for (let value = formFields[param].min; value <= formFields[param].max; value += step) {
             const testData = { ...formData, [param]: value };
             const { similarity: testSimilarity } = processor.findClosestMatch(testData, dataSource);
             const testMatchPercentage = testSimilarity === 0 ? 100 : Math.max(0, 100 - testSimilarity * 10);
-            
+
             if (testMatchPercentage >= 70) {
               testPoints.push(value);
             }
@@ -73,7 +74,7 @@ const SimXRD = () => {
               .map(([key, range]) => {
                 const label = formFields[key].label;
                 return `${label}: ${range.min.toFixed(1)}-${range.max.toFixed(1)}` +
-                       `${key === 'temperature' ? '°C' : key === 'time' ? 'h' : ''}`;
+                  `${key === 'temperature' ? '°C' : key === 'time' ? 'h' : ''}`;
               })
               .join('\n') +
             '\n\n注：以上范围是在保持其他参数不变的情况下计算得出';
@@ -88,46 +89,14 @@ const SimXRD = () => {
       }
 
       try {
-        // 加载并处理 XRD 数据
-        const response = await fetch(`/xrd_data/${closestData.source}.json`);
-        if (!response.ok) {
-          throw new Error(`Failed to load XRD data for ${closestData.source} (${response.status})`);
-        }
-        
-        let xrdData;
-        try {
-          xrdData = await response.json();
-        } catch (jsonError) {
-          console.error('Invalid JSON response:', await response.text());
-          throw new Error('Invalid XRD data format');
-        }
-
-        // 确保数据格式正确
-        if (!Array.isArray(xrdData) || !xrdData.length || !xrdData[0]['2THETA'] || !xrdData[0]['Cnt2_D1']) {
-          console.error('Invalid XRD data structure:', xrdData);
-          throw new Error('Invalid XRD data structure');
-        }
-
-        // 处理数据
-        const processedData = processor.processXRDData(xrdData);
-
-        // 转换处理后的数据为图表所需格式
-        const chartData = processedData.angles.map((angle, index) => ({
-          '2THETA': angle,
-          'Cnt2_D1': processedData.intensities[index]
-        }));
-
+        const xrdData = await fetchXRDData(closestData.id);
         setResultData({
-          img: `/xrd_images/${closestData.img}`,
-          source: closestData.source,
-          result: closestData.result,
-          data: chartData,
-          similarity: matchPercentage
+          ...xrdData,
+          similarity: similarity === 0 ? 100 : Math.max(0, 100 - similarity * 10)
         });
-
-      } catch (dataError) {
-        console.error('Error loading XRD data:', dataError);
-        alert(`无法加载 XRD 数据 (${closestData.source}): ${dataError.message}`);
+      } catch (error) {
+        console.error('Error loading XRD data:', error);
+        alert('加载 XRD 数据失败');
       }
 
     } catch (error) {
@@ -147,11 +116,11 @@ const SimXRD = () => {
                 <h5 className="card-title mb-0">参数设置</h5>
               </div>
               <div className="card-body" style={{ overflowY: 'auto' }}>
-                <XRDForm 
+                <XRDForm
                   onSubmit={handleFormSubmit}
                   suggestions={formSuggestions}
                 />
-                
+
                 {/* 添加参数说明区域 */}
                 {!resultData && (
                   <div className="mt-4">
