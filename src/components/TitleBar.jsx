@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import simxrdLogo from '../assets/simxrd.png'; // 假设您将图片移动到了 assets 目录
 
 const TitleBar = () => {
   const [isMaximized, setIsMaximized] = useState(false);
@@ -67,7 +68,13 @@ const TitleBar = () => {
 
   return (
     <div className="title-bar" data-maximized={isMaximized}>
-      <div className="title-text">SimXRD-DUT</div>
+      <div className="title-logo-container">
+        <img 
+          src={simxrdLogo} 
+          alt="SimXRD Logo" 
+          className="title-logo"
+        />
+      </div>
       <div className="test-shape">
         <div
           className="test-button minimize"

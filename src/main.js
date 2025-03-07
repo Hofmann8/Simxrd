@@ -34,6 +34,7 @@ function createWindow() {
     frame: false,
     transparent: true,
     backgroundColor: '#00000000',
+    icon: path.join(__dirname, '../public/simxrd.ico'),
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
