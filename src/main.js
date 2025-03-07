@@ -4,6 +4,13 @@ const fs = require("fs");
 const isDev = process.argv.includes('dev');
 
 let mainWindow;
+let isWindowMaximized = false;
+let originalBounds = {
+  width: 1440,
+  height: 900,
+  x: 100,
+  y: 100
+};
 
 // 注册自定义协议处理器
 function registerFileProtocol() {
@@ -61,12 +68,36 @@ function createWindow() {
           mainWindow.minimize();
           return true;
         case 'maximize':
-          if (mainWindow.isMaximized()) {
-            mainWindow.unmaximize();
+          // 使用我们自己的状态变量
+          console.log('当前最大化状态(自定义跟踪):', isWindowMaximized);
+          if (isWindowMaximized) {
+            console.log('窗口已最大化，执行还原操作');
+            // 保存当前窗口大小和位置
+            if (mainWindow.isFullScreen()) {
+              // 如果是全屏模式，先退出全屏
+              mainWindow.setFullScreen(false);
+            }
+            
+            // 设置为原始大小
+            setTimeout(() => {
+              mainWindow.setBounds(originalBounds);
+              isWindowMaximized = false;
+              mainWindow.webContents.send('window-maximize-change', false);
+            }, 100);
+            
+            return false;
           } else {
-            mainWindow.maximize();
+            console.log('窗口未最大化，执行最大化操作');
+            // 保存当前窗口大小和位置
+            originalBounds = mainWindow.getBounds();
+            console.log('保存原始窗口边界:', originalBounds);
+            
+            // 使用全屏模式
+            mainWindow.setFullScreen(true);
+            isWindowMaximized = true;
+            mainWindow.webContents.send('window-maximize-change', true);
+            return true;
           }
-          return mainWindow.isMaximized();
         case 'close':
           mainWindow.close();
           return true;
@@ -79,12 +110,27 @@ function createWindow() {
     }
   });
 
-  // 监听窗口状态变化
+  // 添加检查窗口是否最大化的处理程序
+  ipcMain.handle('window-is-maximized', () => {
+    console.log('检查窗口最大化状态(自定义跟踪):', isWindowMaximized);
+    return isWindowMaximized;
+  });
+
+  // 保留原有的处理程序以兼容现有代码
+  ipcMain.handle('window-is-fullscreen', () => {
+    return mainWindow.isMaximized();
+  });
+
+  // 监听最大化状态变化
   mainWindow.on('maximize', () => {
+    console.log('窗口已最大化 - 事件触发');
+    isWindowMaximized = true;
     mainWindow.webContents.send('window-maximize-change', true);
   });
 
   mainWindow.on('unmaximize', () => {
+    console.log('窗口已还原 - 事件触发');
+    isWindowMaximized = false;
     mainWindow.webContents.send('window-maximize-change', false);
   });
 

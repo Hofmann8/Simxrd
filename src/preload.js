@@ -15,37 +15,33 @@ window.addEventListener("DOMContentLoaded", () => {
 // 统一的 electronAPI
 contextBridge.exposeInMainWorld('electronAPI', {
   // 窗口控制
-  minimizeWindow: async () => {
-    try {
-      return await ipcRenderer.invoke('window-control', 'minimize');
-    } catch (error) {
-      console.error('Minimize error:', error);
-      return false;
-    }
-  },
-  maximizeWindow: async () => {
-    try {
-      return await ipcRenderer.invoke('window-control', 'maximize');
-    } catch (error) {
-      console.error('Maximize error:', error);
-      return false;
-    }
-  },
-  closeWindow: async () => {
-    try {
-      return await ipcRenderer.invoke('window-control', 'close');
-    } catch (error) {
-      console.error('Close error:', error);
-      return false;
-    }
-  },
+  minimizeWindow: () => ipcRenderer.invoke('window-control', 'minimize'),
+  maximizeWindow: () => ipcRenderer.invoke('window-control', 'maximize'),
+  closeWindow: () => ipcRenderer.invoke('window-control', 'close'),
   
   // 事件监听
   onMaximizeChange: (callback) => {
-    const handler = (_, value) => callback(value);
-    ipcRenderer.on('window-maximize-change', handler);
-    return () => ipcRenderer.removeListener('window-maximize-change', handler);
-  }
+    ipcRenderer.on('window-maximize-change', (_, isMaximized) => callback(isMaximized));
+    return () => {
+      ipcRenderer.removeAllListeners('window-maximize-change');
+    };
+  },
+
+  // 新增方法
+  isWindowMaximized: async () => {
+    try {
+      return await ipcRenderer.invoke('window-is-maximized');
+    } catch (error) {
+      console.error('Check maximize error:', error);
+      return false;
+    }
+  },
+
+  // 添加检查窗口是否全屏的方法
+  isWindowFullScreen: () => ipcRenderer.invoke('window-is-maximized'),
+
+  // 添加检查窗口是否最大化的处理程序
+  isWindowMaximized: () => ipcRenderer.invoke('window-is-maximized'),
 });
 
 // 事件监听器

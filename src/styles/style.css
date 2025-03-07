@@ -1,5 +1,6 @@
 body {
     font-family: Arial, sans-serif;
+    background-color: transparent !important;
 }
 
 .container {
@@ -186,4 +187,18 @@ body.electron-app .app-content {
 body.electron-app .navbar {
     top: 32px;
     height: calc(100vh - 32px);
+}
+
+.app-wrapper {
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 10px;
+    overflow: hidden;
+    height: 100vh;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+/* 添加最大化状态下的样式 */
+.app-wrapper[data-maximized="true"] {
+    border-radius: 0;
+    /* 最大化时移除圆角 */
 }
