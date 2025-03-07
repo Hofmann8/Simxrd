@@ -146,7 +146,7 @@ body.electron-app .navbar {
 .app-content {
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    height: 100%;
     /* 删除 margin-left */
 }
 
@@ -180,7 +180,6 @@ body.electron-app .app-content {
 /* 内容区域使用 padding-left 来避免被 Navbar 遮挡 */
 .app-container {
     width: 100%;
-    min-height: 100vh;
 }
 
 /* Electron 环境下的标题栏适配 */

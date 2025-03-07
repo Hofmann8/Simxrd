@@ -18,9 +18,9 @@ body {
 
 body {
   position: relative;
-  /* 始终保留滚动条空间，防止布局弹跳 */
+  /* 修改滚动条行为，只在需要时显示 */
   overflow-x: hidden;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 /* 当内容超出时才显示滚动条 */
@@ -90,6 +90,7 @@ html.has-scroll body {
 /* 对于需要单独滚动的容器 */
 .scrollable-container {
   overflow-y: auto;
+  /* 改为 auto，只在需要时显示 */
   overflow-x: hidden;
   padding-right: 6px;
   scrollbar-width: thin;
@@ -552,8 +553,6 @@ html.has-scroll body {
   overflow: hidden;
   border: 1px solid #e9ecef;
   border-radius: 12px;
-  margin-right: 12px;
-  /* 默认状态下的右侧间距 */
   background-color: #ffffff;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   position: relative;
@@ -778,4 +777,17 @@ body.electron-app .main-content {
   transform: translate(-50%, -50%);
   margin-top: 2px;
   margin-left: -2px;
+}
+
+/* 为所有 container-fluid 添加适当的上下内边距 */
+.container-fluid {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+/* 特别是在页面组件中的 container-fluid */
+.simxrd-page .container-fluid,
+.reference-structure-page .container-fluid {
+  padding-top: 8px;
+  padding-bottom: 8px;
 }

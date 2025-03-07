@@ -81,8 +81,8 @@ const ReferenceStructure = () => {
   }, []);  // 移除 handleStructureSelect 和 selectedStructure 依赖
 
   return (
-    <div className="reference-structure-page" style={{height: '100vh' }}>
-      <div className="container-fluid h-100 py-4">
+    <div className="reference-structure-page" style={{height: 'calc(100vh - 8px)' }}>
+      <div className="container-fluid h-100">
         <div className="row h-100">
           {/* 左侧信息栏 - 设置高度100%并添加滚动 */}
           <div className="col-md-4 h-100">
