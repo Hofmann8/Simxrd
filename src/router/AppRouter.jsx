@@ -1,5 +1,5 @@
 import React from 'react';
-import { HashRouter as Router, Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import Navbar from '../components/Navbar';
 import SimXRD from '../pages/SimXRD';

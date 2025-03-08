@@ -2,16 +2,19 @@
 const isElectron = typeof process !== 'undefined' && process.versions && process.versions.electron;
 console.log("isElectron", isElectron)
 // 只在 Electron 环境中导入 Node.js 模块
-let path;
+let pathModule;
 if (isElectron) {
   try {
-    path = require('path');
+    pathModule = require('path');
     console.log('预加载脚本: 成功导入 path 模块');
   } catch (error) {
     console.error('预加载脚本: 导入 path 模块失败:', error);
+    pathModule = {
+      join: (...args) => args.join('/'),
+      resolve: (...args) => args.join('/')
+    };
   }
 }
-
 // 预加载脚本开始
 console.log('预加载脚本开始加载...', isElectron ? '在 Electron 环境中' : '在 Web 环境中');
 
@@ -93,7 +96,7 @@ if (isElectron) {
         console.log('渲染进程: 调用 convertFilePath:', filePath);
         // 将相对路径转换为绝对路径
         if (!filePath.startsWith('/') && !filePath.includes('://')) {
-          const result = `file://${path.resolve(filePath)}`;
+          const result = `file://${pathModule.resolve(filePath)}`;
           console.log('渲染进程: convertFilePath 结果:', result);
           return result;
         }
@@ -103,7 +106,7 @@ if (isElectron) {
       // 获取 JSmol 路径
       getJsmolPath: () => {
         console.log('渲染进程: 调用 getJsmolPath');
-        const result = path.join(process.resourcesPath, 'app', 'build', 'jsmol', 'j2s');
+        const result = pathModule.join(process.resourcesPath, 'app', 'build', 'jsmol', 'j2s');
         console.log('渲染进程: getJsmolPath 结果:', result);
         return result;
       },
