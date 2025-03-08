@@ -109,9 +109,9 @@ function createWindow() {
             originalBounds = mainWindow.getBounds();
             console.log('主进程: 保存原始窗口边界:', originalBounds);
 
-            // 使用全屏模式
-            console.log('主进程: 设置窗口为全屏模式');
-            mainWindow.setFullScreen(true);
+            // 使用maximize()方法代替setFullScreen(true)
+            console.log('主进程: 设置窗口为最大化');
+            mainWindow.maximize();
             isWindowMaximized = true;
             console.log('主进程: 发送窗口最大化状态变化事件: true');
             mainWindow.webContents.send('window-maximize-change', true);
@@ -200,7 +200,7 @@ function createWindow() {
   });
 
   // 打开开发者工具
-  if (isDev) {
+  if (isDev && process.argv.includes('--devtools')) {
     console.log('主进程: 打开开发者工具');
     mainWindow.webContents.openDevTools();
   }

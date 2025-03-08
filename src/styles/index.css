@@ -692,8 +692,6 @@ html.has-scroll body {
 .main-content>div {
   display: flex;
   width: 100%;
-  height: calc(100% - 48px);
-  /* 减去标题栏高度 */
 }
 
 /* 应用容器 */

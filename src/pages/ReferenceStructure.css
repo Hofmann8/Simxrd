@@ -1,0 +1,85 @@
+/* ReferenceStructure 页面样式 */
+.reference-structure-page {
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 内容区域 */
+.reference-content {
+  flex: 1;
+  overflow: auto;
+  padding: 20px;
+}
+
+/* 确保卡片容器不会溢出 */
+.structure-cards-container {
+  height: 100%;
+  overflow-y: auto;
+}
+
+/* 卡片网格布局 */
+.structure-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  padding-bottom: 20px;
+}
+
+/* 结构卡片样式 */
+.structure-card {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.structure-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.structure-card-header {
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.structure-card-body {
+  padding: 15px;
+  flex: 1;
+}
+
+.structure-card-footer {
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+}
+
+/* 结构详情页面 */
+.structure-detail-page {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.structure-detail-content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .structure-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+
+  .structure-detail-content {
+    flex-direction: column;
+  }
+}

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import './ReferenceStructure.css';
 import CrystalStructureDisplay from '../components/CrystalStructureDisplay';
 import { FaCubes } from 'react-icons/fa';
 
@@ -81,7 +82,7 @@ const ReferenceStructure = () => {
   }, []);  // 移除 handleStructureSelect 和 selectedStructure 依赖
 
   return (
-    <div className="reference-structure-page" style={{height: 'calc(100vh - 8px)' }}>
+    <div className="reference-structure-page">
       <div className="container-fluid h-100">
         <div className="row h-100">
           {/* 左侧信息栏 - 设置高度100%并添加滚动 */}
@@ -173,7 +174,7 @@ const ReferenceStructure = () => {
                         className={`btn ${selectedStructure === structure
                           ? 'btn-primary'
                           : 'btn-outline-primary'
-                        }`}
+                          }`}
                         onClick={() => handleStructureSelect(structure)}
                       >
                         {structure}
