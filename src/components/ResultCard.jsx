@@ -3,6 +3,7 @@ import ReactECharts from 'echarts-for-react';
 import ToolBar from './ToolBar';
 import { FaFileExport } from 'react-icons/fa';
 import ExportModal from './ExportModal';
+import LowMatchWarningModal from './LowMatchWarningModal';
 import './ResultCard.css';
 
 const ResultCard = ({ resultData }) => {
@@ -11,6 +12,7 @@ const ResultCard = ({ resultData }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showExportModal, setShowExportModal] = useState(false);
   const [isGenerationComplete, setIsGenerationComplete] = useState(false);
+  const [showLowMatchWarning, setShowLowMatchWarning] = useState(false);
 
   // 当 resultData 改变时重置状态
   useEffect(() => {
@@ -18,6 +20,14 @@ const ResultCard = ({ resultData }) => {
     setIsPaused(false);
     setSpeed(1);
     setIsGenerationComplete(false);
+
+    // 检查匹配度是否低于阈值
+    if (resultData && resultData.similarity !== undefined && resultData.similarity < 70) {
+      setShowLowMatchWarning(true);
+    } else {
+      setShowLowMatchWarning(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resultData.source]);
 
   // 动画效果
@@ -64,13 +74,15 @@ const ResultCard = ({ resultData }) => {
   };
 
   const handleExportClick = () => {
-    console.log('导出按钮被点击');
     setShowExportModal(true);
   };
 
   const handleCloseModal = () => {
-    console.log('关闭模态框按钮被点击');
     setShowExportModal(false);
+  };
+
+  const handleCloseLowMatchWarning = () => {
+    setShowLowMatchWarning(false);
   };
 
   const exportToCSV = () => {
@@ -126,60 +138,51 @@ const ResultCard = ({ resultData }) => {
       };
     }
 
+    // 获取当前显示的数据
     const displayData = resultData.data.slice(0, currentIndex + 1);
 
-    if (!displayData.every(point => '2THETA' in point && 'Cnt2_D1' in point)) {
-      return {
-        title: {
-          text: '数据格式错误',
-          left: 'center',
-          top: 'center'
-        }
-      };
-    }
+    // 计算数据范围
+    const xValues = displayData.map(item => item['2THETA']);
+    const yValues = displayData.map(item => item['Cnt2_D1']);
 
-    const currentXValues = displayData.map(point => point['2THETA']);
-    const currentYValues = displayData.map(point => point['Cnt2_D1']);
-    const minX = Math.min(...currentXValues);
-    const maxX = Math.max(...currentXValues);
-    const maxY = Math.max(...currentYValues);
+    const minX = Math.min(...xValues);
+    const maxX = Math.max(...xValues);
+    const maxY = Math.max(...yValues);
 
     return {
-      animation: false,
-      backgroundColor: '#ffffff',
       grid: {
-        top: 60,
+        left: 60,
         right: 40,
-        bottom: 60,
-        left: 70,
-        containLabel: true
-      },
-      title: {
-        text: 'XRD 衍射图谱',
-        left: 'center',
-        top: 10,
-        textStyle: {
-          fontSize: 16,
-          fontWeight: 'normal'
-        }
+        top: 60,
+        bottom: 60
       },
       tooltip: {
         trigger: 'axis',
+        formatter: function (params) {
+          const data = params[0].data;
+          return `2θ: ${data[0].toFixed(2)}°<br/>强度: ${data[1].toFixed(2)} cps`;
+        },
         axisPointer: {
           type: 'cross',
           label: {
             backgroundColor: '#6a7985'
           }
-        },
-        formatter: function (params) {
-          return `2θ: ${params[0].data[0].toFixed(2)}°<br/>强度: ${params[0].data[1].toFixed(2)}`;
         }
+      },
+      toolbox: {
+        feature: {
+          saveAsImage: {
+            pixelRatio: 2
+          }
+        },
+        right: 20,
+        top: 10
       },
       xAxis: {
         type: 'value',
         name: '2θ (°)',
         nameLocation: 'center',
-        nameGap: 35,
+        nameGap: 30,
         min: minX,
         max: maxX,
         splitLine: {
@@ -194,10 +197,6 @@ const ResultCard = ({ resultData }) => {
           lineStyle: {
             color: '#333'
           }
-        },
-        axisLabel: {
-          formatter: (value) => value.toFixed(2) + '°',
-          margin: 12
         }
       },
       yAxis: {
@@ -324,6 +323,13 @@ const ResultCard = ({ resultData }) => {
         onClose={handleCloseModal}
         resultData={resultData}
         onExport={exportToCSV}
+      />
+
+      {/* 使用独立的低匹配度警告弹窗组件 */}
+      <LowMatchWarningModal
+        show={showLowMatchWarning}
+        onClose={handleCloseLowMatchWarning}
+        similarity={resultData.similarity || 0}
       />
     </div>
   );

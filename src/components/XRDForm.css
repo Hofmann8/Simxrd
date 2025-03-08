@@ -1,3 +1,18 @@
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.special-value-toast {
+  animation: fadeIn 0.3s ease;
+}
+
 .form-range {
     height: 10px;
     padding: 0;
@@ -12,4 +27,37 @@
 .suggestion-range {
     pointer-events: none;
     box-shadow: 0 0 4px rgba(255, 193, 7, 0.5);
+}
+
+/* 新增样式 */
+.slider-container-wrapper {
+  height: 40px;  /* 增加高度，为提示留出空间 */
+  margin-bottom: 10px;
+}
+
+.suggestion-tooltip {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.slider-container-wrapper:hover .suggestion-tooltip {
+  opacity: 1;
+}
+
+/* 确保提示始终显示在上层 */
+.suggestion-tooltip {
+  z-index: 10 !important;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .slider-container-wrapper {
+    height: 50px;  /* 移动端增加更多高度 */
+  }
+  
+  .suggestion-tooltip {
+    opacity: 1;  /* 移动端始终显示提示 */
+    font-size: 9px;
+    padding: 1px 4px;
+  }
 }

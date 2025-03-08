@@ -29,7 +29,6 @@ const SimXRD = () => {
       if (matchPercentage < 70) {
         const suggestedRanges = {};
         const parameters = Object.keys(formFields);
-        let hasAnySuggestion = false;
 
         // 为每个参数计算可行区间
         for (const param of parameters) {
@@ -52,37 +51,11 @@ const SimXRD = () => {
               min: Math.min(...testPoints),
               max: Math.max(...testPoints)
             };
-            hasAnySuggestion = true;
           }
           // 如果没有找到可行点，不添加该参数的建议区间
         }
 
-        if (!hasAnySuggestion) {
-          // 如果所有参数都没有可行区间
-          alert(
-            `当前参数组合与已知数据差异较大 (匹配度: ${matchPercentage.toFixed(1)}%)。\n\n` +
-            `建议：\n` +
-            `1. 检查参数输入是否正确\n` +
-            `2. 考虑更大范围的参数调整\n` +
-            `3. 可能需要进行实验验证`
-          );
-        } else {
-          // 有可行区间时显示建议
-          const message = `当前参数匹配度较低 (${matchPercentage.toFixed(1)}%)。\n` +
-            `建议调整范围（保持其他参数不变）：\n\n` +
-            Object.entries(suggestedRanges)
-              .map(([key, range]) => {
-                const label = formFields[key].label;
-                return `${label}: ${range.min.toFixed(1)}-${range.max.toFixed(1)}` +
-                  `${key === 'temperature' ? '°C' : key === 'time' ? 'h' : ''}`;
-              })
-              .join('\n') +
-            '\n\n注：以上范围是在保持其他参数不变的情况下计算得出';
-
-          alert(message);
-        }
-
-        // 更新表单的建议区间（即使某些参数没有建议）
+        // 更新表单的建议区间
         setFormSuggestions(suggestedRanges);
       } else {
         setFormSuggestions(null);
@@ -96,17 +69,19 @@ const SimXRD = () => {
         });
       } catch (error) {
         console.error('Error loading XRD data:', error);
-        alert('加载 XRD 数据失败');
+        // 使用自定义弹窗替代 alert
+        // 这里可以添加一个错误提示弹窗组件
       }
 
     } catch (error) {
       console.error('Error in form submission:', error);
-      alert(`处理表单数据时出错: ${error.message}`);
+      // 使用自定义弹窗替代 alert
+      // 这里可以添加一个错误提示弹窗组件
     }
   };
 
   return (
-    <div className="simxrd-page" style={{height: 'calc(100vh - 8px)' }}>
+    <div className="simxrd-page" style={{ height: 'calc(100vh - 8px)' }}>
       <div className="container-fluid h-100">
         <div className="row h-100">
           {/* 左侧参数设置区域 */}
@@ -126,11 +101,11 @@ const SimXRD = () => {
                   <div className="mt-4">
                     <h6 className="text-primary mb-3">参数说明</h6>
                     <div className="small text-muted">
-                      <p className="mb-2">• SiO₂/Al₂O₃ 比例：影响沸石的骨架结构，建议范围 3-10</p>
-                      <p className="mb-2">• Na₂O/SiO₂ 比例：影响结晶度，建议范围 0.5-2</p>
-                      <p className="mb-2">• H₂O/SiO₂ 比例：影响晶化速率，建议范围 10-25</p>
+                      <p className="mb-2">• SiO₂/Na₂O 比例：影响沸石的骨架结构，建议范围 3-6</p>
+                      <p className="mb-2">• Na₂O/Al₂O₃ 比例：影响结晶度，建议范围 2-6</p>
+                      <p className="mb-2">• H₂O/Na₂O 比例：影响晶化速率，建议范围 8-15</p>
                       <p className="mb-2">• 时间：晶化时间，建议范围 2-24小时</p>
-                      <p className="mb-2">• 温度：晶化温度，建议范围 70-100℃</p>
+                      <p className="mb-2">• 温度：晶化温度，建议范围 80-100℃</p>
                     </div>
                   </div>
                 )}
