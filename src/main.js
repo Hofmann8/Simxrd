@@ -210,15 +210,47 @@ function createWindow() {
     try {
       // 处理文件路径
       let processedPath = filePath;
+
+      // 移除 file:// 前缀
       if (filePath.startsWith('file://')) {
         processedPath = filePath.replace('file://', '');
       }
 
-      console.log('主进程: 处理后的文件路径:', processedPath);
-      // 检查文件是否存在
-      const exists = fs.existsSync(processedPath);
-      console.log('主进程: 文件存在:', exists);
-      return exists;
+      // 处理相对路径
+      if (filePath.startsWith('./')) {
+        processedPath = filePath.substring(2);
+      }
+
+      // 尝试多种路径
+      const possiblePaths = [];
+
+      // 1. 原始路径
+      possiblePaths.push(processedPath);
+
+      // 2. 相对于应用根目录的路径
+      const appPath = app.getAppPath();
+      possiblePaths.push(path.join(appPath, processedPath));
+
+      // 3. 相对于 build 目录的路径
+      possiblePaths.push(path.join(appPath, 'build', processedPath));
+
+      // 4. 相对于 public 目录的路径
+      possiblePaths.push(path.join(appPath, 'public', processedPath));
+
+      // 5. 相对于当前工作目录的路径
+      possiblePaths.push(path.join(process.cwd(), processedPath));
+
+      console.log('主进程: 尝试以下路径:');
+      for (const p of possiblePaths) {
+        console.log(`- ${p}`);
+        if (fs.existsSync(p)) {
+          console.log('主进程: 文件存在于路径:', p);
+          return true;
+        }
+      }
+
+      console.log('主进程: 文件不存在于任何尝试的路径');
+      return false;
     } catch (error) {
       console.error('主进程: 检查文件是否存在错误:', error);
       return false;

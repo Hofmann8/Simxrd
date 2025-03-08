@@ -8,6 +8,10 @@ if (isElectron) {
     path = require('path');
     console.log('预加载脚本: 成功导入 path 模块');
   } catch (error) {
+    path = {
+      join: (...args) => args.join('/'),
+      resolve: (...args) => args.join('/')
+    };
     console.error('预加载脚本: 导入 path 模块失败:', error);
   }
 }
@@ -91,19 +95,47 @@ if (isElectron) {
       // 文件操作
       convertFilePath: (filePath) => {
         console.log('渲染进程: 调用 convertFilePath:', filePath);
-        // 将相对路径转换为绝对路径
-        if (!filePath.startsWith('/') && !filePath.includes('://')) {
-          const result = `file://${path.resolve(filePath)}`;
-          console.log('渲染进程: convertFilePath 结果:', result);
-          return result;
+        try {
+          // 获取应用程序路径
+          const app = require('electron').remote ? require('electron').remote.app : require('@electron/remote').app;
+          const appPath = app.getAppPath();
+          console.log('应用程序路径:', appPath);
+
+          // 构建绝对路径
+          let absolutePath;
+          if (process.env.NODE_ENV === 'development') {
+            // 开发环境
+            absolutePath = path.resolve(process.cwd(), 'public', filePath);
+          } else {
+            // 生产环境 - 使用 app.getAppPath() 获取应用根目录
+            absolutePath = path.resolve(appPath, filePath);
+          }
+
+          // 转换为 file:// URL
+          const fileUrl = `file://${absolutePath.replace(/\\/g, '/')}`;
+          console.log('转换后的文件 URL:', fileUrl);
+          return fileUrl;
+        } catch (error) {
+          console.error('转换文件路径错误:', error);
+          // 如果出错，尝试使用相对路径
+          try {
+            const cwd = process.cwd();
+            console.log('当前工作目录:', cwd);
+            const absolutePath = path.resolve(cwd, filePath);
+            const fileUrl = `file://${absolutePath.replace(/\\/g, '/')}`;
+            console.log('备用文件 URL:', fileUrl);
+            return fileUrl;
+          } catch (e) {
+            console.error('备用路径处理错误:', e);
+            return filePath;
+          }
         }
-        return filePath;
       },
 
       // 获取 JSmol 路径
       getJsmolPath: () => {
         console.log('渲染进程: 调用 getJsmolPath');
-        const result = path.join(process.resourcesPath, 'app', 'build', 'jsmol', 'j2s');
+        const result = path.join(process.resourcesPath, 'build', 'jsmol', 'j2s');
         console.log('渲染进程: getJsmolPath 结果:', result);
         return result;
       },

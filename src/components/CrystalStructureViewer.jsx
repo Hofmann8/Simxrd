@@ -13,10 +13,10 @@ const CrystalStructureViewer = ({ filePath, displayOptions, saveViewerState }) =
     if (jsmolInitializedRef.current && filePathRef.current === filePath) {
       return;
     }
-    
+
     // 更新当前文件路径引用
     filePathRef.current = filePath;
-    
+
     if (!window.Jmol) {
       console.error('JSmol 库未加载');
       return;
@@ -31,7 +31,59 @@ const CrystalStructureViewer = ({ filePath, displayOptions, saveViewerState }) =
     // 处理 Electron 环境下的文件路径
     let processedFilePath = filePath;
     if (isElectron && window.electronAPI && window.electronAPI.convertFilePath) {
-      processedFilePath = window.electronAPI.convertFilePath(filePath);
+      try {
+        console.log('处理前的文件路径:', filePath);
+
+        // 确保路径是相对于应用根目录的
+        let relativePath = filePath;
+        if (filePath.startsWith('./')) {
+          // 移除开头的 './'
+          relativePath = filePath.substring(2);
+        }
+
+        // 检查文件是否存在
+        const fileExists = window.electronAPI.fileExists(relativePath);
+        console.log('文件是否存在:', fileExists);
+
+        if (fileExists) {
+          // 如果文件存在，使用 convertFilePath 处理
+          processedFilePath = window.electronAPI.convertFilePath(relativePath);
+        } else {
+          // 如果文件不存在，尝试其他路径
+          console.warn('文件不存在，尝试其他路径');
+
+          // 尝试在 public 目录中查找
+          const publicPath = `public/${relativePath}`;
+          const publicExists = window.electronAPI.fileExists(publicPath);
+          console.log('public 路径是否存在:', publicExists);
+
+          if (publicExists) {
+            processedFilePath = window.electronAPI.convertFilePath(publicPath);
+          } else {
+            // 尝试在 build 目录中查找
+            const buildPath = `build/${relativePath}`;
+            const buildExists = window.electronAPI.fileExists(buildPath);
+            console.log('build 路径是否存在:', buildExists);
+
+            if (buildExists) {
+              processedFilePath = window.electronAPI.convertFilePath(buildPath);
+            } else {
+              console.error('无法找到文件:', filePath);
+              // 使用原始路径，但可能会失败
+              processedFilePath = filePath;
+            }
+          }
+        }
+
+        console.log('处理后的文件路径:', processedFilePath);
+      } catch (error) {
+        console.error('转换文件路径错误:', error);
+        processedFilePath = filePath; // 出错时使用原始路径
+      }
+    } else {
+      // 非 Electron 环境，确保使用相对路径
+      processedFilePath = filePath;
+      console.log('非 Electron 环境，使用原始路径:', processedFilePath);
     }
 
     // 初始化脚本 - 使用更高级的设置
@@ -77,14 +129,16 @@ const CrystalStructureViewer = ({ filePath, displayOptions, saveViewerState }) =
     `;
 
     // 获取 j2sPath - 在 Web 环境中使用默认路径
-    let j2sPath = '/jsmol/j2s';
-    if (isElectron && window.electronAPI && window.electronAPI.getJsmolPath) {
-      try {
-        j2sPath = window.electronAPI.getJsmolPath();
-      } catch (error) {
-        console.error('获取 JSmol 路径失败，使用默认路径:', error);
-      }
-    }
+    // 使用相对路径，确保在开发和生产环境中都能正确加载
+    let j2sPath = './jsmol/j2s';
+    // if (isElectron && window.electronAPI && window.electronAPI.getJsmolPath) {
+    //   try {
+    //     j2sPath = window.electronAPI.getJsmolPath();
+    //   } catch (error) {
+    //     console.error('获取 JSmol 路径失败，使用默认路径:', error);
+    //   }
+    // }
+    console.log("j2sPath", j2sPath);
 
     const jmolInfo = {
       width: '100%',
@@ -225,12 +279,12 @@ const CrystalStructureViewer = ({ filePath, displayOptions, saveViewerState }) =
       if (prevOptionsRef.current.backgroundColor !== displayOptions.backgroundColor) {
         window.Jmol.script(window.jmolApplet0, `background ${displayOptions.backgroundColor};`);
       }
-      
+
       // 只有当光照效果变化时才更新
       if (prevOptionsRef.current.lighting !== displayOptions.lighting) {
         window.Jmol.script(window.jmolApplet0, getLightingScript(displayOptions.lighting));
       }
-      
+
       // 只有当自旋状态变化时才更新
       if (prevOptionsRef.current.spinning !== displayOptions.spinning) {
         window.Jmol.script(window.jmolApplet0, displayOptions.spinning ? 'spin on;' : 'spin off;');

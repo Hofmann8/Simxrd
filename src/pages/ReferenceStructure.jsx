@@ -12,7 +12,7 @@ const ReferenceStructure = () => {
   // 使用 useMemo 包装 modelOptions
   const modelOptions = useMemo(() => ({
     FAU: {
-      path: '/xyz_data/FAU.xyz',
+      path: './xyz_data/FAU.xyz',
       description: 'FAU型沸石是一种大孔沸石，具有三维孔道系统，常用于催化裂化和吸附分离。',
       features: ['大孔径: 7.4 Å', '硅铝比: 1.0-3.0', '空间群: Fd-3m', '单胞参数: a = 24.3 Å'],
       detailedInfo: {
@@ -28,7 +28,7 @@ const ReferenceStructure = () => {
       }
     },
     LTA: {
-      path: '/xyz_data/LTA.xyz',
+      path: './xyz_data/LTA.xyz',
       description: 'LTA型沸石具有α笼和β笼结构，是一种重要的分子筛，广泛用于气体分离和离子交换。',
       features: ['孔径: 4.2 Å', '硅铝比: 1.0-2.0', '空间群: Pm-3m', '单胞参数: a = 11.9 Å'],
       detailedInfo: {
@@ -43,7 +43,7 @@ const ReferenceStructure = () => {
       }
     },
     SOD: {
-      path: '/xyz_data/SOD.xyz',
+      path: './xyz_data/SOD.xyz',
       description: 'SOD型沸石是一种具有笼状结构的沸石，具有高热稳定性，常用于离子交换和催化反应。',
       features: ['孔径: 2.8 Å', '硅铝比: 1.0-3.0', '空间群: Im-3m', '单胞参数: a = 8.9 Å'],
       detailedInfo: {
@@ -63,17 +63,32 @@ const ReferenceStructure = () => {
   const handleStructureSelect = useCallback((structure) => {
     setErrorMessage(''); // 清除之前的错误
 
+    // 获取文件路径
+    let filePath = modelOptions[structure].path;
+
     // 在 Electron 环境中检查文件是否存在
     if (isElectron && window.electronAPI) {
-      const fileExists = window.electronAPI.fileExists(modelOptions[structure].path);
+      // 检查文件是否存在
+      const fileExists = window.electronAPI.fileExists(filePath);
       if (!fileExists) {
-        setErrorMessage(`文件 ${modelOptions[structure].path} 不存在，请确保数据文件已正确安装。`);
+        setErrorMessage(`文件 ${filePath} 不存在，请确保数据文件已正确安装。`);
+        return;
+      }
+
+      // 在 Electron 环境中，使用 electronAPI.convertFilePath 处理文件路径
+      try {
+        // 这里不直接修改 filePath，而是在 CrystalStructureViewer 组件中处理
+        console.log('原始文件路径:', filePath);
+        console.log('Electron 环境:', isElectron);
+      } catch (error) {
+        console.error('处理文件路径错误:', error);
+        setErrorMessage(`处理文件路径时出错: ${error.message}`);
         return;
       }
     }
 
     setSelectedStructure(structure);
-    setSelectedFile(modelOptions[structure].path);
+    setSelectedFile(filePath);
   }, [isElectron, modelOptions]);
 
   useEffect(() => {

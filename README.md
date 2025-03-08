@@ -218,3 +218,83 @@ SimXRD-DUT 是一个用于模拟和分析 XRD 衍射图谱的应用程序，专�
 ## 技术支持
 
 如有问题，请联系技术支持团队。
+
+## SimXRD - X射线衍射模拟工具
+
+### 路径问题解决方案
+
+```
+在不同环境下，文件路径的处理方式存在差异：
+
+1. Web 开发环境
+   - 应用通过 http://localhost:3000 加载
+   - 绝对路径 /jsmol/JSmol.min.js 可以正确解析
+   - 相对路径 xyz_data/SOD.xyz 可以正确解析
+
+2. Web 生产环境
+   - 应用通过 file:// 协议加载 build/index.html
+   - 绝对路径在 file:// 协议下无法正确解析
+   - 解决方案：使用相对路径 ./jsmol/JSmol.min.js 和 ./xyz_data/SOD.xyz
+
+3. Electron 环境
+   - 应用通过 Electron 加载，文件路径处理更复杂
+   - 需要使用 Electron 的 API 来处理文件路径
+   - 解决方案：
+     a. 在 preload.js 中实现 convertFilePath 函数，将相对路径转换为绝对路径
+     b. 在 CrystalStructureViewer 组件中使用 electronAPI.convertFilePath 处理文件路径
+     c. 根据环境（开发/生产）构建不同的绝对路径
+     d. 使用 app.getAppPath() 获取应用程序根目录
+     e. 尝试多种可能的文件路径位置
+
+文件路径处理流程：
+1. ReferenceStructure.jsx 中定义相对路径 './xyz_data/SOD.xyz'
+2. 使用 electronAPI.fileExists 检查文件是否存在
+3. 如果文件存在，使用 electronAPI.convertFilePath 处理路径
+4. 如果文件不存在，尝试在 public 和 build 目录中查找
+5. preload.js 中的 convertFilePath 函数根据环境构建正确的绝对路径
+6. 最终生成类似 file:///path/to/app/xyz_data/SOD.xyz 的 URL
+
+这种方法确保了应用在所有环境中都能正确加载资源文件。
+
+注意事项：
+1. 确保 xyz_data 目录存在于应用程序根目录、public 目录或 build 目录中
+2. 在 Electron 环境中，文件路径处理更为复杂，需要考虑多种可能的路径
+3. 使用 app.getAppPath() 获取应用程序根目录，而不是使用 process.resourcesPath
+4. 在开发环境和生产环境中，文件路径的处理方式不同
+```
+
+### 项目说明
+
+SimXRD 是一个用于模拟和分析 X 射线衍射的工具，基于 Electron 和 React 开发。
+
+#### 主要功能
+
+- 晶体结构可视化（使用 JSmol）
+- X 射线衍射模拟
+- 衍射数据分析
+
+#### 技术栈
+
+- React 17
+- Electron
+- JSmol (晶体结构可视化)
+- Bootstrap 5
+
+#### 开发与构建
+
+```bash
+# 开发模式
+npm run electron-dev:utf8
+
+# 生产模式
+npm run electron-prod:utf8
+
+# 构建应用
+npm run electron-build:win
+```
+
+#### 注意事项
+
+- 确保系统编码设置为 UTF-8 (使用 chcp 65001)
+- 在 Windows 环境下开发和测试
+- 确保 public 目录下有 jsmol 和 xyz_data 文件夹
