@@ -29,9 +29,11 @@ function registerFileProtocol() {
 
 function createWindow() {
   console.log('主进程: 创建主窗口');
+
+  // 修改预加载脚本路径的处理
   const preloadPath = isDev
     ? path.join(__dirname, 'preload.js')
-    : path.join(process.resourcesPath, 'app', 'src', 'preload.js');
+    : path.join(__dirname, 'preload.js');  // 生产环境下直接使用相对路径
 
   console.log('主进程: 使用预加载脚本路径:', preloadPath);
   console.log('主进程: 预加载脚本是否存在:', fs.existsSync(preloadPath));
@@ -62,14 +64,38 @@ function createWindow() {
   }
 
   if (process.argv.includes('dev')) {
-    // 开发环境：使用 localhost
     console.log('主进程: 加载开发环境 URL: http://localhost:3000');
     mainWindow.loadURL('http://localhost:3000');
   } else {
-    // 生产环境：使用构建文件
-    const startUrl = path.join(__dirname, '../build/index.html');
+    // 修改生产环境文件路径的处理
+    const startUrl = path.join(__dirname, '..', 'build', 'index.html');
     console.log('主进程: 加载生产环境文件:', startUrl);
-    mainWindow.loadFile(startUrl);
+
+    if (fs.existsSync(startUrl)) {
+      console.log('主进程: 找到生产环境文件');
+      mainWindow.loadFile(startUrl).catch(err => {
+        console.error('主进程: 加载生产环境文件失败:', err);
+        // 如果加载失败，尝试使用 file:// 协议
+        const fileUrl = `file://${startUrl}`;
+        console.log('主进程: 尝试使用 file:// 协议加载:', fileUrl);
+        mainWindow.loadURL(fileUrl).catch(err => {
+          console.error('主进程: 使用 file:// 协议加载也失败:', err);
+        });
+      });
+    } else {
+      console.error('主进程: 生产环境文件不存在:', startUrl);
+      // 尝试列出目录内容以帮助调试
+      try {
+        const buildDir = path.join(__dirname, '..', 'build');
+        if (fs.existsSync(buildDir)) {
+          console.log('主进程: build 目录内容:', fs.readdirSync(buildDir));
+        } else {
+          console.log('主进程: build 目录不存在');
+        }
+      } catch (err) {
+        console.error('主进程: 列出目录内容失败:', err);
+      }
+    }
   }
 
   // 修改 IPC 处理方式

@@ -1,6 +1,6 @@
 // 检查是否在 Electron 环境中运行
 const isElectron = typeof process !== 'undefined' && process.versions && process.versions.electron;
-
+console.log("isElectron", isElectron)
 // 只在 Electron 环境中导入 Node.js 模块
 let path;
 if (isElectron) {

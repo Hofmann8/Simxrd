@@ -1,7 +1,11 @@
 {
-  "name": "frontend",
-  "version": "0.1.0",
+  "name": "simxrd",
+  "version": "0.9.2-beta",
+  "description": "X射线衍射模拟工具",
+  "author": "Lin Kai <Alexphant@mail.dlut.edu.cn>",
+  "license": "MIT",
   "private": true,
+  "homepage": ".",
   "dependencies": {
     "@arco-design/web-react": "^2.61.2",
     "@fontsource/roboto": "^5.1.0",
@@ -39,6 +43,11 @@
     "kill-port": "npx kill-port 3000",
     "electron-dev-clean": "npm run kill-port && npm run electron-dev",
     "build:wasm": "cd wasm/xrd_core && compile.bat",
+    "build:utf8": "chcp 65001 && react-scripts build",
+    "electron-dev:utf8": "chcp 65001 && concurrently \"cross-env BROWSER=none npm start\" \"wait-on http://localhost:3000 && electron . dev\"",
+    "electron-prod:utf8": "chcp 65001 && npm run build && electron . prod",
+    "electron-build": "chcp 65001 && electron-builder",
+    "electron-build:win": "chcp 65001 && electron-builder --win",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -65,10 +74,11 @@
     "concurrently": "^9.1.2",
     "cross-env": "^7.0.3",
     "electron": "^33.0.1",
+    "electron-builder": "^25.1.8",
     "electron-devtools-installer": "^3.2.0",
+    "kill-port": "^2.0.1",
     "react-app-rewired": "^2.2.1",
-    "wait-on": "^8.0.2",
-    "kill-port": "^2.0.1"
+    "wait-on": "^8.0.2"
   },
   "jest": {
     "transform": {
@@ -82,5 +92,45 @@
       "\\.(gif|ttf|eot|svg)$": "<rootDir>/__mocks__/fileMock.js"
     }
   },
-  "main": "src/main.js"
+  "main": "src/main.js",
+  "build": {
+    "appId": "com.dlut.simxrd",
+    "productName": "SimXRD",
+    "copyright": "Copyright © 2024 Lin Kai, DUT",
+    "files": [
+      "build/**/*",
+      "src/main.js",
+      "src/preload.js",
+      "src/preload-simple.js",
+      "node_modules/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "src",
+        "to": "app/src",
+        "filter": [
+          "preload.js",
+          "preload-simple.js"
+        ]
+      }
+    ],
+    "directories": {
+      "buildResources": "public",
+      "output": "dist"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "public/simxrd.ico"
+    },
+    "extraMetadata": {
+      "main": "src/main.js"
+    },
+    "asar": {
+      "smartUnpack": false
+    },
+    "npmRebuild": false,
+    "forceCodeSigning": false
+  }
 }
