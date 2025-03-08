@@ -58,6 +58,7 @@ const fetchXRDData = async (id) => {
       img: `/xrd_images/${xrdInfo.img}`,
       result: xrdInfo.result,
       source: xrdInfo.source,
+      similarity: xrdInfo.similarity || 85, // 添加默认匹配度
       metadata: {
         sio2: xrdInfo.sio2,
         na2o: xrdInfo.na2o,

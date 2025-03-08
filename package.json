@@ -33,7 +33,7 @@
     "test": "react-scripts test",
     "lint": "eslint src --ext .js,.jsx,.ts,.tsx",
     "coverage": "npm run test -- --watchAll=false --coverage",
-    "electron-dev": "concurrently \"cross-env BROWSER=none npm start || true\" \"wait-on -v http://localhost:3000 && cross-env NODE_ENV=development electron . dev\"",
+    "electron-dev": "concurrently \"cross-env BROWSER=none npm start\" \"wait-on http://localhost:3000 && electron . dev\"",
     "electron-prod": "npm run build && electron .",
     "electron": "npm run electron-dev",
     "kill-port": "npx kill-port 3000",
@@ -82,5 +82,5 @@
       "\\.(gif|ttf|eot|svg)$": "<rootDir>/__mocks__/fileMock.js"
     }
   },
-  "main": "./src/main.js"
+  "main": "src/main.js"
 }

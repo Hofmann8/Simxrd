@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 
 const CrystalStructureViewer = ({ filePath, displayOptions, saveViewerState }) => {
   const viewerRef = useRef(null);
-  const isElectron = window.electron !== undefined;
+  const isElectron = window.isElectron || !!window.electronAPI;
   const jsmolInitializedRef = useRef(false);
   const prevOptionsRef = useRef(displayOptions);
   const filePathRef = useRef(filePath);
@@ -30,7 +30,7 @@ const CrystalStructureViewer = ({ filePath, displayOptions, saveViewerState }) =
 
     // 处理 Electron 环境下的文件路径
     let processedFilePath = filePath;
-    if (isElectron && window.electronAPI) {
+    if (isElectron && window.electronAPI && window.electronAPI.convertFilePath) {
       processedFilePath = window.electronAPI.convertFilePath(filePath);
     }
 
@@ -76,11 +76,21 @@ const CrystalStructureViewer = ({ filePath, displayOptions, saveViewerState }) =
       set allowContextMenu false;
     `;
 
+    // 获取 j2sPath - 在 Web 环境中使用默认路径
+    let j2sPath = '/jsmol/j2s';
+    if (isElectron && window.electronAPI && window.electronAPI.getJsmolPath) {
+      try {
+        j2sPath = window.electronAPI.getJsmolPath();
+      } catch (error) {
+        console.error('获取 JSmol 路径失败，使用默认路径:', error);
+      }
+    }
+
     const jmolInfo = {
       width: '100%',
       height: '100%',
       use: 'HTML5',
-      j2sPath: isElectron && window.electronAPI ? window.electronAPI.getJsmolPath() : '/jsmol/j2s',
+      j2sPath: j2sPath,
       script: initScript,
       disableJ2SLoadMonitor: true,
       disableInitialConsole: true,
@@ -91,14 +101,14 @@ const CrystalStructureViewer = ({ filePath, displayOptions, saveViewerState }) =
 
         // 应用初始显示选项
         applyDisplayStyle(displayOptions.frameworkStyle);
-        
+
         // 应用初始坐标轴设置
         if (displayOptions.showAxes) {
           window.Jmol.script(window.jmolApplet0, 'axes on;');
         } else {
           window.Jmol.script(window.jmolApplet0, 'axes off;');
         }
-        
+
         // 应用初始自旋设置
         if (displayOptions.spinning) {
           window.Jmol.script(window.jmolApplet0, 'spin on;');
@@ -138,11 +148,11 @@ const CrystalStructureViewer = ({ filePath, displayOptions, saveViewerState }) =
         console.error('Error saving JSmol state:', e);
       }
     };
-  }, [filePath, isElectron, saveViewerState, displayOptions]); 
+  }, [filePath, isElectron, saveViewerState, displayOptions]);
 
   // 获取光照效果脚本
   const getLightingScript = (lighting) => {
-    switch(lighting) {
+    switch (lighting) {
       case 'soft':
         return `
           set ambientPercent 60;
@@ -176,8 +186,8 @@ const CrystalStructureViewer = ({ filePath, displayOptions, saveViewerState }) =
   // 应用显示风格
   const applyDisplayStyle = (style) => {
     if (!window.jmolApplet0) return;
-    
-    switch(style) {
+
+    switch (style) {
       case 'wireframe':
         window.Jmol.script(window.jmolApplet0, 'wireframe 0.1; spacefill 0%; color cpk;');
         break;
@@ -201,7 +211,7 @@ const CrystalStructureViewer = ({ filePath, displayOptions, saveViewerState }) =
       if (prevOptionsRef.current.frameworkStyle !== displayOptions.frameworkStyle) {
         applyDisplayStyle(displayOptions.frameworkStyle);
       }
-      
+
       // 只有当坐标轴显示设置变化时才更新
       if (prevOptionsRef.current.showAxes !== displayOptions.showAxes) {
         if (displayOptions.showAxes) {
@@ -210,7 +220,7 @@ const CrystalStructureViewer = ({ filePath, displayOptions, saveViewerState }) =
           window.Jmol.script(window.jmolApplet0, 'axes off;');
         }
       }
-      
+
       // 只有当背景颜色变化时才更新
       if (prevOptionsRef.current.backgroundColor !== displayOptions.backgroundColor) {
         window.Jmol.script(window.jmolApplet0, `background ${displayOptions.backgroundColor};`);

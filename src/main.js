@@ -14,18 +14,28 @@ let originalBounds = {
 
 // 注册自定义协议处理器
 function registerFileProtocol() {
+  console.log('主进程: 注册文件协议处理器');
   protocol.registerFileProtocol('file', (request, callback) => {
     const url = request.url.replace('file://', '');
     try {
+      console.log('主进程: 处理文件请求:', url);
       return callback(decodeURIComponent(url));
     } catch (error) {
-      console.error('Protocol handler error:', error);
+      console.error('主进程: 协议处理器错误:', error);
       return callback(404);
     }
   });
 }
 
 function createWindow() {
+  console.log('主进程: 创建主窗口');
+  const preloadPath = isDev
+    ? path.join(__dirname, 'preload.js')
+    : path.join(process.resourcesPath, 'app', 'src', 'preload.js');
+
+  console.log('主进程: 使用预加载脚本路径:', preloadPath);
+  console.log('主进程: 预加载脚本是否存在:', fs.existsSync(preloadPath));
+
   mainWindow = new BrowserWindow({
     width: 1440,
     height: 900,
@@ -39,120 +49,183 @@ function createWindow() {
       nodeIntegration: false,
       contextIsolation: true,
       webSecurity: true,
-      preload: isDev
-        ? path.join(__dirname, 'preload.js')
-        : path.join(process.resourcesPath, 'app', 'src', 'preload.js'),
+      preload: preloadPath,
       enableRemoteModule: false
     }
   });
 
   // 简化平台特定配置
   if (process.platform === 'darwin') {
+    console.log('主进程: 配置 macOS 特定设置');
     app.dock.show();
     mainWindow.setWindowButtonVisibility(true);
   }
 
   if (process.argv.includes('dev')) {
     // 开发环境：使用 localhost
+    console.log('主进程: 加载开发环境 URL: http://localhost:3000');
     mainWindow.loadURL('http://localhost:3000');
   } else {
     // 生产环境：使用构建文件
     const startUrl = path.join(__dirname, '../build/index.html');
+    console.log('主进程: 加载生产环境文件:', startUrl);
     mainWindow.loadFile(startUrl);
   }
 
   // 修改 IPC 处理方式
   ipcMain.handle('window-control', async (event, command) => {
+    console.log('主进程: 收到窗口控制命令:', command);
     try {
       switch (command) {
         case 'minimize':
+          console.log('主进程: 执行最小化窗口');
           mainWindow.minimize();
           return true;
         case 'maximize':
           // 使用我们自己的状态变量
-          console.log('当前最大化状态(自定义跟踪):', isWindowMaximized);
+          console.log('主进程: 当前最大化状态(自定义跟踪):', isWindowMaximized);
           if (isWindowMaximized) {
-            console.log('窗口已最大化，执行还原操作');
+            console.log('主进程: 窗口已最大化，执行还原操作');
             // 保存当前窗口大小和位置
             if (mainWindow.isFullScreen()) {
               // 如果是全屏模式，先退出全屏
+              console.log('主进程: 退出全屏模式');
               mainWindow.setFullScreen(false);
             }
-            
+
             // 设置为原始大小
             setTimeout(() => {
+              console.log('主进程: 还原窗口到原始大小:', originalBounds);
               mainWindow.setBounds(originalBounds);
               isWindowMaximized = false;
+              console.log('主进程: 发送窗口最大化状态变化事件: false');
               mainWindow.webContents.send('window-maximize-change', false);
             }, 100);
-            
+
             return false;
           } else {
-            console.log('窗口未最大化，执行最大化操作');
+            console.log('主进程: 窗口未最大化，执行最大化操作');
             // 保存当前窗口大小和位置
             originalBounds = mainWindow.getBounds();
-            console.log('保存原始窗口边界:', originalBounds);
-            
+            console.log('主进程: 保存原始窗口边界:', originalBounds);
+
             // 使用全屏模式
+            console.log('主进程: 设置窗口为全屏模式');
             mainWindow.setFullScreen(true);
             isWindowMaximized = true;
+            console.log('主进程: 发送窗口最大化状态变化事件: true');
             mainWindow.webContents.send('window-maximize-change', true);
             return true;
           }
         case 'close':
+          console.log('主进程: 关闭窗口');
           mainWindow.close();
           return true;
         default:
+          console.log('主进程: 未知命令:', command);
           return false;
       }
     } catch (error) {
-      console.error('Window control error:', error);
+      console.error('主进程: 窗口控制错误:', error);
       return false;
     }
   });
 
   // 添加检查窗口是否最大化的处理程序
   ipcMain.handle('window-is-maximized', () => {
-    console.log('检查窗口最大化状态(自定义跟踪):', isWindowMaximized);
+    console.log('主进程: 检查窗口最大化状态(自定义跟踪):', isWindowMaximized);
     return isWindowMaximized;
   });
 
   // 保留原有的处理程序以兼容现有代码
   ipcMain.handle('window-is-fullscreen', () => {
-    return mainWindow.isMaximized();
+    const isMaximized = mainWindow.isMaximized();
+    console.log('主进程: 检查窗口是否最大化(原生):', isMaximized);
+    return isMaximized;
   });
 
   // 监听最大化状态变化
   mainWindow.on('maximize', () => {
-    console.log('窗口已最大化 - 事件触发');
+    console.log('主进程: 窗口已最大化 - 事件触发');
     isWindowMaximized = true;
+    console.log('主进程: 发送窗口最大化状态变化事件: true');
     mainWindow.webContents.send('window-maximize-change', true);
   });
 
   mainWindow.on('unmaximize', () => {
-    console.log('窗口已还原 - 事件触发');
+    console.log('主进程: 窗口已还原 - 事件触发');
     isWindowMaximized = false;
+    console.log('主进程: 发送窗口最大化状态变化事件: false');
+    mainWindow.webContents.send('window-maximize-change', false);
+  });
+
+  mainWindow.on('enter-full-screen', () => {
+    console.log('主进程: 窗口进入全屏模式');
+    isWindowMaximized = true;
+    console.log('主进程: 发送窗口最大化状态变化事件: true');
+    mainWindow.webContents.send('window-maximize-change', true);
+  });
+
+  mainWindow.on('leave-full-screen', () => {
+    console.log('主进程: 窗口离开全屏模式');
+    isWindowMaximized = false;
+    console.log('主进程: 发送窗口最大化状态变化事件: false');
     mainWindow.webContents.send('window-maximize-change', false);
   });
 
   mainWindow.on('closed', () => {
+    console.log('主进程: 窗口已关闭');
     mainWindow = null;
   });
+
+  // 添加文件存在检查处理程序
+  ipcMain.handle('file-exists', async (_, filePath) => {
+    console.log('主进程: 检查文件是否存在:', filePath);
+    try {
+      // 处理文件路径
+      let processedPath = filePath;
+      if (filePath.startsWith('file://')) {
+        processedPath = filePath.replace('file://', '');
+      }
+
+      console.log('主进程: 处理后的文件路径:', processedPath);
+      // 检查文件是否存在
+      const exists = fs.existsSync(processedPath);
+      console.log('主进程: 文件存在:', exists);
+      return exists;
+    } catch (error) {
+      console.error('主进程: 检查文件是否存在错误:', error);
+      return false;
+    }
+  });
+
+  // 打开开发者工具
+  if (isDev) {
+    console.log('主进程: 打开开发者工具');
+    mainWindow.webContents.openDevTools();
+  }
 }
 
 app.whenReady().then(() => {
+  console.log('主进程: 应用程序准备就绪');
   registerFileProtocol();
   createWindow();
 });
 
 app.on("window-all-closed", () => {
+  console.log('主进程: 所有窗口已关闭');
   if (process.platform !== "darwin") {
+    console.log('主进程: 退出应用程序');
     app.quit();
   }
 });
 
 app.on("activate", () => {
+  console.log('主进程: 应用程序激活');
   if (mainWindow === null) {
+    console.log('主进程: 重新创建窗口');
     createWindow();
   }
 });
+
+console.log('主进程: 主进程脚本已加载');
