@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaGithub, FaEnvelope, FaUniversity } from 'react-icons/fa';
+import { FaGithub, FaEnvelope, FaUniversity, FaRocket, FaCode } from 'react-icons/fa';
 
 const About = () => {
   return (
@@ -17,15 +17,51 @@ const About = () => {
                     <div className="mb-4">
                       <h4 className="text-primary mb-3">项目介绍</h4>
                       <p>
-                        SimXRD 是一款专为材料科学研究人员设计的X射线衍射模拟工具，
-                        旨在帮助研究人员快速预测和分析晶体结构的衍射特性。
-                      </p>
-                      <p>
                         本软件集成了晶体结构可视化、XRD模拟和数据分析等功能，
                         为沸石材料的研究提供了便捷的工具支持。
                       </p>
                       <div className="alert alert-warning mt-3">
                         <strong>注意：</strong> 本软件中的数据仅供本科生教学参考，模拟精度不适用于为实际科研作指导。
+                      </div>
+                    </div>
+                    
+                    <div className="mb-4">
+                      <h4 className="text-primary mb-3">版本信息</h4>
+                      <div className="card bg-light">
+                        <div className="card-body">
+                          <h5 className="card-title">SimXRD v0.9.2 Beta</h5>
+                          <p className="card-text text-muted">最后更新: 2024年5月</p>
+                          <div className="d-flex align-items-center mt-3">
+                            <span className="badge bg-info me-2">测试版</span>
+                            <small className="text-muted">功能持续优化中</small>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="mb-4">
+                      <h4 className="text-primary mb-3">即将推出的功能</h4>
+                      <div className="list-group">
+                        <div className="list-group-item">
+                          <div className="d-flex w-100 justify-content-between align-items-center">
+                            <h5 className="mb-1">
+                              <FaRocket className="text-primary me-2" />
+                              AI智能助手
+                            </h5>
+                            <span className="badge bg-warning">开发中</span>
+                          </div>
+                          <p className="mb-1">基于大语言模型的智能助手，提供实时沸石合成建议和参数优化</p>
+                        </div>
+                        <div className="list-group-item">
+                          <div className="d-flex w-100 justify-content-between align-items-center">
+                            <h5 className="mb-1">
+                              <FaCode className="text-primary me-2" />
+                              多端同步
+                            </h5>
+                            <span className="badge bg-info">规划中</span>
+                          </div>
+                          <p className="mb-1">支持云端数据同步，实现多设备间无缝协作和数据共享</p>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -45,8 +81,7 @@ const About = () => {
                             </div>
                           </div>
                           <p className="small">
-                            本项目由大连理工大学化学学院研究团队开发，
-                            旨在为沸石材料研究提供便捷的计算和分析工具。
+                            本项目由大连理工大学化学学院本科生林凯全栈开发，实验数据来源于王瑜老师课题组。
                           </p>
                           <a 
                             href="https://zdysc.dlut.edu.cn/" 

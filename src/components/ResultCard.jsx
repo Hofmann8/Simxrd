@@ -21,14 +21,17 @@ const ResultCard = ({ resultData }) => {
     setSpeed(1);
     setIsGenerationComplete(false);
 
-    // 检查匹配度是否低于阈值
-    if (resultData && resultData.similarity !== undefined && resultData.similarity < 70) {
-      setShowLowMatchWarning(true);
-    } else {
-      setShowLowMatchWarning(false);
+    // 检查匹配度是否低于阈值 - 改进的检查逻辑
+    if (resultData && typeof resultData.similarity === 'number') {
+      // 使用明确的数值比较，并确保只有在有效数据时才显示警告
+      if (resultData.similarity < 70) {
+        console.log('显示低匹配度警告:', resultData.similarity);
+        setShowLowMatchWarning(true);
+      } else {
+        setShowLowMatchWarning(false);
+      }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resultData.source]);
+  }, [resultData]); // 移除特定依赖，改为监听整个resultData对象
 
   // 动画效果
   useEffect(() => {
@@ -168,15 +171,6 @@ const ResultCard = ({ resultData }) => {
             backgroundColor: '#6a7985'
           }
         }
-      },
-      toolbox: {
-        feature: {
-          saveAsImage: {
-            pixelRatio: 2
-          }
-        },
-        right: 20,
-        top: 10
       },
       xAxis: {
         type: 'value',

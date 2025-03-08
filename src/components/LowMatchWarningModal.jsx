@@ -3,6 +3,11 @@ import { createPortal } from 'react-dom';
 import { FaExclamationTriangle } from 'react-icons/fa';
 
 const LowMatchWarningModal = ({ show, onClose, similarity }) => {
+  // 添加调试日志
+  useEffect(() => {
+    console.log('LowMatchWarningModal: show =', show, 'similarity =', similarity);
+  }, [show, similarity]);
+
   useEffect(() => {
     if (show) {
       // 禁止背景滚动

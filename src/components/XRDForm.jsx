@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FaInfoCircle } from 'react-icons/fa';
 import { formFields, specialTimePresets, specialPresets } from '../config/formConfig';
 import './XRDForm.css';
@@ -14,6 +14,29 @@ const XRDForm = ({ onSubmit, suggestions }) => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [presetToApply, setPresetToApply] = useState(null);
   const [specialValueInfo, setSpecialValueInfo] = useState(null);
+  // 引用外层卡片容器
+  const cardBodyRef = useRef(null);
+
+  // 组件挂载时查找外层卡片容器
+  useEffect(() => {
+    // 查找最近的 .card-body 祖先元素
+    const findCardBody = () => {
+      const formElement = document.querySelector('form');
+      if (formElement) {
+        let parent = formElement.parentElement;
+        while (parent) {
+          if (parent.classList.contains('card-body')) {
+            return parent;
+          }
+          parent = parent.parentElement;
+        }
+      }
+      return null;
+    };
+
+    cardBodyRef.current = findCardBody();
+    console.log('找到卡片容器:', cardBodyRef.current);
+  }, []);
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -222,6 +245,38 @@ const XRDForm = ({ onSubmit, suggestions }) => {
         </div>
       </form>
 
+      {/* 特殊值信息提示 - 渲染到外层卡片容器 */}
+      {specialValueInfo && document.querySelector('.card-body') && (
+        <div
+          className="special-value-toast"
+          style={{
+            position: 'absolute',
+            bottom: '20px',
+            right: '20px',
+            backgroundColor: 'rgba(25, 135, 84, 0.95)',
+            color: 'white',
+            padding: '15px 20px',
+            borderRadius: '8px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            zIndex: 1060,
+            maxWidth: '350px',
+            animation: 'fadeIn 0.3s ease'
+          }}
+        >
+          <div className="d-flex align-items-center mb-2">
+            <strong>特殊参数值</strong>
+          </div>
+          <div>
+            <p className="mb-1">
+              {formFields[specialValueInfo.paramId].label}: <strong>{specialValueInfo.value}</strong>
+            </p>
+            <p className="mb-0 small">
+              {specialValueInfo.description}
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* 特殊时间值确认弹窗 */}
       {showConfirmModal && presetToApply && (
         <div className="modal-backdrop show" style={{ zIndex: 1050 }}></div>
@@ -282,38 +337,6 @@ const XRDForm = ({ onSubmit, suggestions }) => {
                 </button>
               </div>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* 特殊值信息提示 */}
-      {specialValueInfo && (
-        <div
-          className="special-value-toast"
-          style={{
-            position: 'fixed',
-            bottom: '20px',
-            right: '20px',
-            backgroundColor: 'rgba(25, 135, 84, 0.95)',
-            color: 'white',
-            padding: '15px 20px',
-            borderRadius: '8px',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-            zIndex: 1060,
-            maxWidth: '350px',
-            animation: 'fadeIn 0.3s ease'
-          }}
-        >
-          <div className="d-flex align-items-center mb-2">
-            <strong>特殊参数值</strong>
-          </div>
-          <div>
-            <p className="mb-1">
-              {formFields[specialValueInfo.paramId].label}: <strong>{specialValueInfo.value}</strong>
-            </p>
-            <p className="mb-0 small">
-              {specialValueInfo.description}
-            </p>
           </div>
         </div>
       )}
