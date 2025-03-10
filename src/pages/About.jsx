@@ -3,7 +3,7 @@ import { FaGithub, FaEnvelope, FaUniversity, FaRocket, FaCode } from 'react-icon
 
 const About = () => {
   return (
-    <div className="about-page" style={{height: 'calc(100vh - 8px)'}}>
+    <div className="about-page" style={{ height: 'calc(100vh - 8px)' }}>
       <div className="container-fluid h-100">
         <div className="row h-100">
           <div className="col-12 h-100">
@@ -24,13 +24,13 @@ const About = () => {
                         <strong>注意：</strong> 本软件中的数据仅供本科生教学参考，模拟精度不适用于为实际科研作指导。
                       </div>
                     </div>
-                    
+
                     <div className="mb-4">
                       <h4 className="text-primary mb-3">版本信息</h4>
                       <div className="card bg-light">
                         <div className="card-body">
                           <h5 className="card-title">SimXRD v0.9.2 Beta</h5>
-                          <p className="card-text text-muted">最后更新: 2024年5月</p>
+                          <p className="card-text text-muted">最后更新: 2025年3月</p>
                           <div className="d-flex align-items-center mt-3">
                             <span className="badge bg-info me-2">测试版</span>
                             <small className="text-muted">功能持续优化中</small>
@@ -38,7 +38,7 @@ const About = () => {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="mb-4">
                       <h4 className="text-primary mb-3">即将推出的功能</h4>
                       <div className="list-group">
@@ -51,6 +51,16 @@ const About = () => {
                             <span className="badge bg-warning">开发中</span>
                           </div>
                           <p className="mb-1">基于大语言模型的智能助手，提供实时沸石合成建议和参数优化</p>
+                        </div>
+                        <div className="list-group-item">
+                          <div className="d-flex w-100 justify-content-between align-items-center">
+                            <h5 className="mb-1">
+                              <FaCode className="text-primary me-2" />
+                              JSmol渲染引擎优化
+                            </h5>
+                            <span className="badge bg-danger">修复中</span>
+                          </div>
+                          <p className="mb-1">解决结构切换时的渲染问题，提升多结构连续查看的稳定性</p>
                         </div>
                         <div className="list-group-item">
                           <div className="d-flex w-100 justify-content-between align-items-center">
@@ -83,9 +93,9 @@ const About = () => {
                           <p className="small">
                             本项目由大连理工大学化学学院本科生林凯全栈开发，实验数据来源于王瑜老师课题组。
                           </p>
-                          <a 
-                            href="https://zdysc.dlut.edu.cn/" 
-                            target="_blank" 
+                          <a
+                            href="https://zdysc.dlut.edu.cn/"
+                            target="_blank"
                             rel="noopener noreferrer"
                             className="btn btn-sm btn-outline-primary mt-2"
                           >

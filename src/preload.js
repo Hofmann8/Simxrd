@@ -196,9 +196,9 @@ if (isElectron) {
       readFile: (filePath) => {
         console.log('渲染进程: 调用 readFile:', filePath);
         return ipcRenderer.invoke('read-file', filePath)
-          .then(result => {
-            console.log('渲染进程: readFile 结果:', result.success ? '成功' : '失败');
-            return result;
+          .then(content => {
+            console.log('渲染进程: readFile 成功，内容长度:', content.length);
+            return content;
           })
           .catch(err => {
             console.error('渲染进程: readFile 错误:', err);

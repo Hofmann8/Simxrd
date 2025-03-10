@@ -264,7 +264,7 @@ function createWindow() {
       console.log('主进程: 文件存在:', exists);
       return exists;
     } catch (error) {
-      console.error('主进程: 检查文件是否存在错误:', error);
+      console.error('主进程: 检查文件是否存在时出错:', error);
       return false;
     }
   });
@@ -282,14 +282,14 @@ function createWindow() {
       let resourcePath;
       if (isDev) {
         // 开发环境中，使用public目录
-        resourcePath = path.join(__dirname, '..', 'public', relativePath);
+        resourcePath = path.join(__dirname, '..', 'public', 'xyz_data', relativePath);
       } else {
         // 生产环境中，使用资源目录
-        resourcePath = path.join(process.resourcesPath, 'app', 'build', relativePath);
+        resourcePath = path.join(process.resourcesPath, 'app', 'build', 'xyz_data', relativePath);
 
         // 检查文件是否存在，如果不存在，尝试其他路径
         if (!fs.existsSync(resourcePath)) {
-          const appPath = path.join(__dirname, '..', 'build', relativePath);
+          const appPath = path.join(__dirname, '..', 'build', 'xyz_data', relativePath);
           if (fs.existsSync(appPath)) {
             resourcePath = appPath;
           }
@@ -297,21 +297,26 @@ function createWindow() {
       }
 
       console.log('主进程: 资源路径:', resourcePath);
-      return resourcePath;
+      // 验证文件是否存在
+      if (fs.existsSync(resourcePath)) {
+        return resourcePath;
+      } else {
+        console.error('主进程: 文件不存在:', resourcePath);
+        return null;
+      }
     } catch (error) {
       console.error('主进程: 获取资源路径错误:', error);
       return null;
     }
   });
 
-  // 添加读取文件内容的处理程序
+  // 添加文件读取处理程序
   ipcMain.handle('read-file', async (_, filePath) => {
-    console.log('主进程: 读取文件内容:', filePath);
+    console.log('主进程: 读取文件:', filePath);
     try {
       // 检查filePath是否为null或undefined
       if (!filePath) {
-        console.error('主进程: 文件路径为空');
-        return { success: false, error: '文件路径为空' };
+        throw new Error('文件路径为空');
       }
 
       // 处理文件路径
@@ -320,51 +325,12 @@ function createWindow() {
         processedPath = filePath.replace('file://', '');
       }
 
-      // 处理相对路径
-      if (filePath.startsWith('/') && !path.isAbsolute(filePath)) {
-        // 在生产环境中，尝试从不同的位置查找文件
-        if (!isDev) {
-          // 尝试从应用程序资源目录查找
-          const resourcePath = path.join(process.resourcesPath, 'app', 'build', filePath.substring(1));
-          console.log('主进程: 尝试从资源目录读取文件:', resourcePath);
-          if (fs.existsSync(resourcePath)) {
-            console.log('主进程: 在资源目录中找到文件');
-            processedPath = resourcePath;
-          } else {
-            // 尝试从应用程序目录查找
-            const appPath = path.join(__dirname, '..', 'build', filePath.substring(1));
-            console.log('主进程: 尝试从应用程序目录读取文件:', appPath);
-            if (fs.existsSync(appPath)) {
-              console.log('主进程: 在应用程序目录中找到文件');
-              processedPath = appPath;
-            }
-          }
-        } else {
-          // 开发环境中，尝试从public目录查找
-          const publicPath = path.join(__dirname, '..', 'public', filePath.substring(1));
-          console.log('主进程: 尝试从public目录读取文件:', publicPath);
-          if (fs.existsSync(publicPath)) {
-            console.log('主进程: 在public目录中找到文件');
-            processedPath = publicPath;
-          }
-        }
-      }
-
-      console.log('主进程: 处理后的文件路径:', processedPath);
-
-      // 检查文件是否存在
-      if (!fs.existsSync(processedPath)) {
-        console.error('主进程: 文件不存在:', processedPath);
-        return { success: false, error: '文件不存在' };
-      }
-
       // 读取文件内容
-      const content = fs.readFileSync(processedPath, 'utf8');
-      console.log('主进程: 成功读取文件内容，长度:', content.length);
-      return { success: true, content };
+      const content = await fs.promises.readFile(processedPath, 'utf8');
+      return content;
     } catch (error) {
-      console.error('主进程: 读取文件内容错误:', error);
-      return { success: false, error: error.message };
+      console.error('主进程: 读取文件时出错:', error);
+      throw error;
     }
   });
 
