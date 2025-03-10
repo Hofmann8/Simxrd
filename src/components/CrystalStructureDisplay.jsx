@@ -148,11 +148,20 @@ const CrystalStructureDisplay = ({ filePath, modelName }) => {
 
         {/* JSmol 查看器区域 */}
         <div className="flex-grow-1 position-relative">
-          <CrystalStructureViewer
-            filePath={filePath}
-            displayOptions={displayOptions}
-            saveViewerState={saveViewerState}
-          />
+          {filePath ? (
+            <CrystalStructureViewer
+              filePath={filePath}
+              displayOptions={displayOptions}
+              saveViewerState={saveViewerState}
+            />
+          ) : (
+            <div className="d-flex flex-column align-items-center justify-content-center h-100 p-4">
+              <div className="alert alert-warning">
+                <h5>无法加载晶体结构</h5>
+                <p>文件路径无效或文件不存在。</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

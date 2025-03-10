@@ -12,51 +12,50 @@ const ReferenceStructure = () => {
   // 使用 useMemo 包装 modelOptions
   const modelOptions = useMemo(() => ({
     FAU: {
-      path: '/xyz_data/FAU.xyz',
-      description: 'FAU型沸石是一种大孔沸石，具有三维孔道系统，常用于催化裂化和吸附分离。',
-      features: ['大孔径: 7.4 Å', '硅铝比: 1.0-3.0', '空间群: Fd-3m', '单胞参数: a = 24.3 Å'],
+      path: '/FAU.xyz',
+      description: '沸石分子筛FAU结构',
+      features: [
+        '大孔道系统',
+        '三维孔道结构',
+        '高稳定性'
+      ],
       detailedInfo: {
         crystalSystem: '立方晶系',
-        spaceGroup: 'Fd3m',
-        cellParameters: 'a ≈ 24.7 Å（具体值会因钠型（NaX、NaY）和其它金属离子调控而有所差异）',
-        framework: '由索达莱单元（sodalite cages）和连接它们的六方柱体构成',
-        supercage: '超笼直径大约为12 Å左右',
-        poreSize: '连接超笼的12元环孔口，开口直径大约在7.4 Å左右，这种大孔系统使其能够容纳较大分子',
-        composition: '典型配方（以NaY为例）：约Na₅₆[Al₅₆Si₁₃₆O₃₈₄]，NaX的Si/Al比约1.2，NaY的Si/Al比可达2.5–3.0',
-        frameworkDensity: '大致为13–14个T原子/1000 Å³',
-        applications: '由于超大孔道适合大分子和重油裂解等催化反应'
+        spaceGroup: 'Fd-3m',
+        cellParameters: 'a = 24.345 Å',
+        frameworkDensity: '12.7 T/1000 Å³'
       }
     },
     LTA: {
-      path: '/xyz_data/LTA.xyz',
-      description: 'LTA型沸石具有α笼和β笼结构，是一种重要的分子筛，广泛用于气体分离和离子交换。',
-      features: ['孔径: 4.2 Å', '硅铝比: 1.0-2.0', '空间群: Pm-3m', '单胞参数: a = 11.9 Å'],
+      path: '/LTA.xyz',
+      description: '沸石分子筛LTA结构',
+      features: [
+        'α笼和β笼结构',
+        '三维孔道系统',
+        '高选择性'
+      ],
       detailedInfo: {
         crystalSystem: '立方晶系',
-        spaceGroup: 'Pm3m',
-        cellParameters: 'a ≈ 12.0～12.3 Å（以NaA型为代表，Si/Al=1）',
-        framework: '以索达莱单元为基本构件，通过双四元环（D4R）连接形成规则的立方结构',
-        poreSize: '孔口主要为8元环窗口，开口直径大约在4.1～4.3 Å左右',
-        composition: 'Na₁₂[(AlO₂)₁₂(SiO₂)₁₂]·nH₂O',
-        frameworkDensity: '大约在15–16个T原子/1000 Å³',
-        applications: '非常适合分子筛分（例如气体分离和干燥）'
+        spaceGroup: 'Fm-3c',
+        cellParameters: 'a = 24.555 Å',
+        frameworkDensity: '14.2 T/1000 Å³'
       }
     },
     SOD: {
-      path: '/xyz_data/SOD.xyz',
-      description: 'SOD型沸石是一种具有笼状结构的沸石，具有高热稳定性，常用于离子交换和催化反应。',
-      features: ['孔径: 2.8 Å', '硅铝比: 1.0-3.0', '空间群: Im-3m', '单胞参数: a = 8.9 Å'],
+      path: '/SOD.xyz',
+      description: '沸石分子筛SOD结构',
+      features: [
+        '六方晶系',
+        'β笼基本结构单元',
+        '高度对称性'
+      ],
       detailedInfo: {
         crystalSystem: '立方晶系',
-        spaceGroup: 'P-43n（部分文献也有报道I-43m）',
-        cellParameters: 'a ≈ 8.9～9.1 Å',
-        framework: '整个结构均由索达莱单元构成，构成紧密而规则的笼状结构',
-        poreSize: '孔口主要由六元环构成，直径大约在2.8～3.0 Å左右，限制了较大分子的进入',
-        composition: '典型化学式如Na₈[Al₆Si₆O₂₄]Cl₂（或其它负载适当的阴离子）',
-        frameworkDensity: '相对较高，通常在16个T原子/1000 Å³左右',
-        applications: '小孔道限制了分子大小，多用于精细分离和特定催化反应'
+        spaceGroup: 'Im-3m',
+        cellParameters: 'a = 8.965 Å',
+        frameworkDensity: '16.7 T/1000 Å³'
       }
-    },
+    }
   }), []); // 空依赖数组，因为这些数据是静态的
 
   // 使用 useCallback 包装 handleStructureSelect 函数
@@ -65,14 +64,59 @@ const ReferenceStructure = () => {
 
     // 在 Electron 环境中检查文件是否存在
     if (isElectron && window.electronAPI) {
-      const fileExists = window.electronAPI.fileExists(modelOptions[structure].path);
-      if (!fileExists) {
-        setErrorMessage(`文件 ${modelOptions[structure].path} 不存在，请确保数据文件已正确安装。`);
+      try {
+        console.log(`检查文件是否存在: ${modelOptions[structure].path}`);
+
+        // 异步检查文件是否存在
+        window.electronAPI.fileExists(modelOptions[structure].path)
+          .then(exists => {
+            if (!exists) {
+              console.error(`文件不存在: ${modelOptions[structure].path}`);
+              setErrorMessage(`文件 ${modelOptions[structure].path} 不存在，请确保数据文件已正确安装。`);
+
+              // 尝试使用getResourcePath获取资源路径
+              if (window.electronAPI.getResourcePath) {
+                const relativePath = modelOptions[structure].path.startsWith('/')
+                  ? modelOptions[structure].path.substring(1)
+                  : modelOptions[structure].path;
+
+                window.electronAPI.getResourcePath(relativePath)
+                  .then(resourcePath => {
+                    console.log(`尝试使用资源路径: ${resourcePath}`);
+                    if (resourcePath && window.electronAPI.fileExists(`file://${resourcePath}`)) {
+                      console.log(`资源路径文件存在，设置选中结构`);
+                      setSelectedStructure(structure);
+                      // 确保路径不为null
+                      setSelectedFile(`file://${resourcePath}`);
+                      setErrorMessage('');
+                    }
+                  })
+                  .catch(err => {
+                    console.error(`获取资源路径失败: ${err}`);
+                  });
+              }
+            } else {
+              console.log(`文件存在，设置选中结构`);
+              setSelectedStructure(structure);
+              // 确保路径不为null
+              setSelectedFile(modelOptions[structure].path);
+            }
+          })
+          .catch(err => {
+            console.error(`检查文件是否存在时出错: ${err}`);
+            setErrorMessage(`检查文件时出错: ${err.message}`);
+          });
+
+        // 不立即设置选中结构，等待文件检查完成
         return;
+      } catch (error) {
+        console.error(`处理文件检查时出错: ${error}`);
       }
     }
 
+    // 如果不在Electron环境中，或者文件检查出错，直接设置选中结构
     setSelectedStructure(structure);
+    // 确保路径不为null
     setSelectedFile(modelOptions[structure].path);
   }, [isElectron, modelOptions]);
 

@@ -1,20 +1,63 @@
 // 检查是否在 Electron 环境中运行
 const isElectron = typeof process !== 'undefined' && process.versions && process.versions.electron;
 console.log("isElectron", isElectron)
-// 只在 Electron 环境中导入 Node.js 模块
-let pathModule;
-if (isElectron) {
-  try {
-    pathModule = require('path');
-    console.log('预加载脚本: 成功导入 path 模块');
-  } catch (error) {
-    console.error('预加载脚本: 导入 path 模块失败:', error);
-    pathModule = {
-      join: (...args) => args.join('/'),
-      resolve: (...args) => args.join('/')
-    };
+
+// 创建一个简单的path模块实现
+const pathModule = {
+  join: (...args) => {
+    // 过滤空字符串
+    const parts = args.filter(part => part !== '');
+    // 使用/连接路径，并处理多余的/
+    return parts.join('/').replace(/\/+/g, '/');
+  },
+  resolve: (...args) => {
+    // 简单实现，不处理..和.
+    return args.join('/').replace(/\/+/g, '/');
+  },
+  dirname: (p) => {
+    // 获取路径的目录部分
+    const parts = p.split('/');
+    parts.pop();
+    return parts.join('/') || '.';
+  },
+  basename: (p, ext) => {
+    // 获取路径的文件名部分
+    const parts = p.split('/');
+    let base = parts[parts.length - 1] || '';
+    if (ext && base.endsWith(ext)) {
+      base = base.slice(0, -ext.length);
+    }
+    return base;
+  },
+  extname: (p) => {
+    // 获取路径的扩展名部分
+    const parts = p.split('.');
+    return parts.length > 1 ? '.' + parts[parts.length - 1] : '';
+  },
+  isAbsolute: (p) => {
+    // 检查路径是否是绝对路径
+    return p.startsWith('/') || /^[A-Za-z]:/.test(p);
+  },
+  parse: (p) => {
+    // 解析路径
+    const root = p.startsWith('/') ? '/' : '';
+    const dir = pathModule.dirname(p);
+    const base = pathModule.basename(p);
+    const ext = pathModule.extname(p);
+    const name = base.slice(0, base.length - ext.length);
+    return { root, dir, base, ext, name };
+  },
+  format: (pathObject) => {
+    // 格式化路径
+    const { root = '', dir = '', base = '', ext = '', name = '' } = pathObject;
+    const path = dir ? `${dir}/${base || (name + ext)}` : (root + (base || (name + ext)));
+    return path;
   }
-}
+};
+
+// 记录使用自定义path模块
+console.log('预加载脚本: 使用自定义 path 模块');
+
 // 预加载脚本开始
 console.log('预加载脚本开始加载...', isElectron ? '在 Electron 环境中' : '在 Web 环境中');
 
@@ -94,6 +137,30 @@ if (isElectron) {
       // 文件操作
       convertFilePath: (filePath) => {
         console.log('渲染进程: 调用 convertFilePath:', filePath);
+
+        // 检查filePath是否为null或undefined
+        if (!filePath) {
+          console.error('渲染进程: 文件路径为空');
+          return '';
+        }
+
+        // 处理相对路径
+        if (filePath.startsWith('/')) {
+          // 在生产环境中，需要特殊处理路径
+          const isDev = process.argv.includes('dev');
+          if (!isDev) {
+            // 尝试使用资源路径
+            try {
+              // 首先尝试从应用程序资源目录加载
+              const resourcePath = pathModule.join(process.resourcesPath, 'app', 'build', filePath.substring(1));
+              console.log('渲染进程: 尝试资源路径:', resourcePath);
+              return `file://${resourcePath}`;
+            } catch (error) {
+              console.error('渲染进程: 资源路径处理错误:', error);
+            }
+          }
+        }
+
         // 将相对路径转换为绝对路径
         if (!filePath.startsWith('/') && !filePath.includes('://')) {
           const result = `file://${pathModule.resolve(filePath)}`;
@@ -109,6 +176,34 @@ if (isElectron) {
         const result = pathModule.join(process.resourcesPath, 'app', 'build', 'jsmol', 'j2s');
         console.log('渲染进程: getJsmolPath 结果:', result);
         return result;
+      },
+
+      // 获取资源路径
+      getResourcePath: (relativePath) => {
+        console.log('渲染进程: 调用 getResourcePath:', relativePath);
+        return ipcRenderer.invoke('get-resource-path', relativePath)
+          .then(result => {
+            console.log('渲染进程: getResourcePath 结果:', result);
+            return result;
+          })
+          .catch(err => {
+            console.error('渲染进程: getResourcePath 错误:', err);
+            throw err;
+          });
+      },
+
+      // 添加 readFile 方法
+      readFile: (filePath) => {
+        console.log('渲染进程: 调用 readFile:', filePath);
+        return ipcRenderer.invoke('read-file', filePath)
+          .then(result => {
+            console.log('渲染进程: readFile 结果:', result.success ? '成功' : '失败');
+            return result;
+          })
+          .catch(err => {
+            console.error('渲染进程: readFile 错误:', err);
+            throw err;
+          });
       },
 
       // 添加 fileExists 方法

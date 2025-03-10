@@ -112,6 +112,10 @@
           "preload.js",
           "preload-simple.js"
         ]
+      },
+      {
+        "from": "build",
+        "to": "app/build"
       }
     ],
     "directories": {

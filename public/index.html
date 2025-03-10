@@ -1,22 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="Web site created using create-react-app"
-    />
-    <title>React App</title>
-    <link rel="icon" href="%PUBLIC_URL%/simxrd.ico" />
-    <link rel="shortcut icon" href="%PUBLIC_URL%/simxrd.ico" />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/simxrd.ico" />
-  </head>
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-    <!--
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="description" content="Web site created using create-react-app" />
+  <title>React App</title>
+  <link rel="icon" href="%PUBLIC_URL%/simxrd.ico" />
+  <link rel="shortcut icon" href="%PUBLIC_URL%/simxrd.ico" />
+  <link rel="apple-touch-icon" href="%PUBLIC_URL%/simxrd.ico" />
+
+  <!-- JSmol库加载 -->
+  <script type="text/javascript">
+    // JSmol全局配置
+    var jmolInitialized = false;
+    var jmol_isReady = function (applet) {
+      console.log("JSmol全局初始化完成:", applet);
+      jmolInitialized = true;
+    }
+    var Info = {
+      width: 0,
+      height: 0,
+      debug: false,
+      color: "white",
+      addSelectionOptions: false,
+      use: "HTML5",
+      j2sPath: "./jsmol/j2s",
+      readyFunction: jmol_isReady,
+      disableJ2SLoadMonitor: false,
+      disableInitialConsole: false,
+      // 性能优化设置
+      antialiasDisplay: true,
+      disableInitialConsole: true,
+      disableJ2SLoadMonitor: true,
+      jarPath: "./jsmol/java",
+      isSigned: false,
+      memoryLimit: 512,
+      allowJavaScript: true
+    };
+
+    // 设置Canvas2D优化选项
+    var setCanvasOptions = function () {
+      if (typeof Jmol !== 'undefined' && typeof Jmol._Canvas2D !== 'undefined') {
+        Jmol._Canvas2D.prototype.setOptions = function (options) {
+          options.willReadFrequently = true;
+          return options;
+        };
+      } else {
+        setTimeout(setCanvasOptions, 100);
+      }
+    };
+
+    // 页面加载完成后设置Canvas选项
+    window.addEventListener('load', function () {
+      setCanvasOptions();
+    });
+  </script>
+  <script src="%PUBLIC_URL%/jsmol/JSmol.min.js"></script>
+</head>
+
+<body>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <div id="root"></div>
+  <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
 
@@ -26,10 +73,6 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
-  </body>
+</body>
+
 </html>
-
-<script src="/jsmol/JSmol.min.js"></script>
-
-
-
