@@ -14,11 +14,39 @@ const SimXRD = () => {
   const [formSuggestions, setFormSuggestions] = useState(null);
 
   useEffect(() => {
+    // 检测是否在Electron环境中
+    const isElectron = window.electronAPI !== undefined;
+
     // 加载数据源
-    fetch('/final_merged_data.json')
-      .then(response => response.json())
-      .then(data => setDataSource(data))
-      .catch(error => console.error('Error loading data:', error));
+    const loadData = async () => {
+      try {
+        if (isElectron && window.electronAPI) {
+          try {
+            // 在Electron环境中使用electronAPI读取文件
+            const resourcePath = await window.electronAPI.getResourcePath('final_merged_data.json');
+            if (resourcePath) {
+              const content = await window.electronAPI.readFile(resourcePath);
+              if (content) {
+                const data = JSON.parse(content);
+                setDataSource(data);
+                return;
+              }
+            }
+          } catch (error) {
+            console.error('使用electronAPI读取数据源失败:', error);
+          }
+        }
+
+        // 如果在Electron中没有成功加载，或者在Web环境中，使用fetch
+        const response = await fetch('/final_merged_data.json');
+        const data = await response.json();
+        setDataSource(data);
+      } catch (error) {
+        console.error('加载数据源失败:', error);
+      }
+    };
+
+    loadData();
   }, []);
 
   const handleFormSubmit = async (formData) => {

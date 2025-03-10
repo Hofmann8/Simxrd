@@ -40,22 +40,73 @@ const fetchSlidesByPresentationId = async (presentationId) => {
 
 const fetchXRDData = async (id) => {
   try {
-    const response = await fetch('/final_merged_data.json');
-    const data = await response.json();
+    // 检测是否在Electron环境中
+    const isElectron = window.electronAPI !== undefined;
+    let xrdInfo = null;
 
-    // 从 final_merged_data.json 中查找对应 id 的数据
-    const xrdInfo = data.find(item => item.id === id);
-    if (!xrdInfo) {
-      throw new Error('XRD data not found');
+    // 加载主数据文件
+    if (isElectron && window.electronAPI) {
+      try {
+        // 在Electron环境中使用electronAPI读取文件
+        const resourcePath = await window.electronAPI.getResourcePath('final_merged_data.json');
+        if (resourcePath) {
+          const content = await window.electronAPI.readFile(resourcePath);
+          if (content) {
+            const data = JSON.parse(content);
+            xrdInfo = data.find(item => item.id === id);
+          }
+        }
+      } catch (error) {
+        console.error('使用electronAPI读取主数据文件失败:', error);
+      }
     }
 
-    // 加载对应的 XRD 数据文件
-    const dataResponse = await fetch(`/xrd_data/${xrdInfo.data}`);
-    const xrdData = await dataResponse.json();
+    // 如果在Electron中没有成功加载，或者在Web环境中，使用fetch
+    if (!xrdInfo) {
+      const response = await fetch('/final_merged_data.json');
+      const data = await response.json();
+      xrdInfo = data.find(item => item.id === id);
+    }
+
+    if (!xrdInfo) {
+      throw new Error('XRD数据未找到');
+    }
+
+    // 加载对应的XRD数据文件
+    let xrdData = null;
+
+    if (isElectron && window.electronAPI) {
+      try {
+        // 在Electron环境中使用electronAPI读取XRD数据文件
+        const dataPath = `xrd_data/${xrdInfo.data}`;
+        const resourcePath = await window.electronAPI.getResourcePath(dataPath);
+        if (resourcePath) {
+          const content = await window.electronAPI.readFile(resourcePath);
+          if (content) {
+            xrdData = JSON.parse(content);
+          }
+        }
+      } catch (error) {
+        console.error('使用electronAPI读取XRD数据文件失败:', error);
+      }
+    }
+
+    // 如果在Electron中没有成功加载，或者在Web环境中，使用fetch
+    if (!xrdData) {
+      const dataResponse = await fetch(`/xrd_data/${xrdInfo.data}`);
+      xrdData = await dataResponse.json();
+    }
+
+    // 构建图像路径
+    let imgPath = `/xrd_images/${xrdInfo.img}`;
+    if (isElectron) {
+      // 在Electron环境中，使用相对路径
+      imgPath = `./xrd_images/${xrdInfo.img}`;
+    }
 
     return {
       data: xrdData,
-      img: `/xrd_images/${xrdInfo.img}`,
+      img: imgPath,
       result: xrdInfo.result,
       source: xrdInfo.source,
       similarity: xrdInfo.similarity || 85, // 添加默认匹配度
@@ -68,7 +119,7 @@ const fetchXRDData = async (id) => {
       }
     };
   } catch (error) {
-    console.error('Failed to fetch XRD data:', error);
+    console.error('获取XRD数据失败:', error);
     throw error;
   }
 };

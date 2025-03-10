@@ -1,4 +1,4 @@
-const { app, BrowserWindow, protocol, ipcMain } = require("electron");
+const { app, BrowserWindow, protocol, ipcMain, screen } = require("electron");
 const path = require("path");
 const fs = require("fs");
 const isDev = process.argv.includes('dev');
@@ -30,6 +30,39 @@ function registerFileProtocol() {
 function createWindow() {
   console.log('主进程: 创建主窗口');
 
+  // 获取主屏幕尺寸
+  const primaryDisplay = screen.getPrimaryDisplay();
+  const { width: screenWidth, height: screenHeight } = primaryDisplay.workAreaSize;
+
+  // 计算适合屏幕的窗口大小
+  // 窗口宽度为屏幕工作区的80%，但不超过1440
+  const windowWidth = Math.min(Math.floor(screenWidth * 0.8), 1440);
+
+  // 窗口高度计算逻辑：
+  // 1. 首先尝试保持16:10的宽高比（比16:9更适合应用界面）
+  // 2. 如果计算出的高度超过屏幕高度的85%，则使用屏幕高度的85%
+  // 3. 所有情况下都不超过900像素
+  const aspectRatio = 16 / 10;
+  const heightByRatio = Math.floor(windowWidth / aspectRatio);
+  const maxHeight = Math.min(Math.floor(screenHeight * 0.85), 900);
+  const windowHeight = Math.min(heightByRatio, maxHeight);
+
+  // 计算窗口位置，使其居中显示
+  const x = Math.floor((screenWidth - windowWidth) / 2);
+  const y = Math.floor((screenHeight - windowHeight) / 2);
+
+  // 更新原始边界值
+  originalBounds = {
+    width: windowWidth,
+    height: windowHeight,
+    x: x,
+    y: y
+  };
+
+  console.log('主进程: 屏幕尺寸:', screenWidth, 'x', screenHeight);
+  console.log('主进程: 窗口尺寸:', windowWidth, 'x', windowHeight);
+  console.log('主进程: 窗口位置:', x, ',', y);
+
   // 修改预加载脚本路径的处理
   const preloadPath = isDev
     ? path.join(__dirname, 'preload.js')
@@ -39,10 +72,12 @@ function createWindow() {
   console.log('主进程: 预加载脚本是否存在:', fs.existsSync(preloadPath));
 
   mainWindow = new BrowserWindow({
-    width: 1440,
-    height: 900,
-    minWidth: 1200,
-    minHeight: 800,
+    width: windowWidth,
+    height: windowHeight,
+    x: x,
+    y: y,
+    minWidth: 1024,  // 最小宽度
+    minHeight: 680,  // 降低最小高度，以适应更小的屏幕
     frame: false,
     transparent: true,
     backgroundColor: '#00000000',
@@ -282,16 +317,49 @@ function createWindow() {
       let resourcePath;
       if (isDev) {
         // 开发环境中，使用public目录
-        resourcePath = path.join(__dirname, '..', 'public', 'xyz_data', relativePath);
+        if (relativePath.startsWith('xyz_data/')) {
+          resourcePath = path.join(__dirname, '..', 'public', relativePath);
+        } else if (relativePath.startsWith('xrd_data/') || relativePath.startsWith('xrd_images/')) {
+          resourcePath = path.join(__dirname, '..', 'public', relativePath);
+        } else if (relativePath === 'final_merged_data.json') {
+          resourcePath = path.join(__dirname, '..', 'public', relativePath);
+        } else {
+          resourcePath = path.join(__dirname, '..', 'public', 'xyz_data', relativePath);
+        }
       } else {
         // 生产环境中，使用资源目录
-        resourcePath = path.join(process.resourcesPath, 'app', 'build', 'xyz_data', relativePath);
+        if (relativePath.startsWith('xyz_data/')) {
+          resourcePath = path.join(process.resourcesPath, 'app', 'build', relativePath);
+        } else if (relativePath.startsWith('xrd_data/') || relativePath.startsWith('xrd_images/')) {
+          resourcePath = path.join(process.resourcesPath, 'app', 'build', relativePath);
+        } else if (relativePath === 'final_merged_data.json') {
+          resourcePath = path.join(process.resourcesPath, 'app', 'build', relativePath);
+        } else {
+          resourcePath = path.join(process.resourcesPath, 'app', 'build', 'xyz_data', relativePath);
+        }
 
         // 检查文件是否存在，如果不存在，尝试其他路径
         if (!fs.existsSync(resourcePath)) {
-          const appPath = path.join(__dirname, '..', 'build', 'xyz_data', relativePath);
-          if (fs.existsSync(appPath)) {
-            resourcePath = appPath;
+          if (relativePath.startsWith('xyz_data/')) {
+            const appPath = path.join(__dirname, '..', 'build', relativePath);
+            if (fs.existsSync(appPath)) {
+              resourcePath = appPath;
+            }
+          } else if (relativePath.startsWith('xrd_data/') || relativePath.startsWith('xrd_images/')) {
+            const appPath = path.join(__dirname, '..', 'build', relativePath);
+            if (fs.existsSync(appPath)) {
+              resourcePath = appPath;
+            }
+          } else if (relativePath === 'final_merged_data.json') {
+            const appPath = path.join(__dirname, '..', 'build', relativePath);
+            if (fs.existsSync(appPath)) {
+              resourcePath = appPath;
+            }
+          } else {
+            const appPath = path.join(__dirname, '..', 'build', 'xyz_data', relativePath);
+            if (fs.existsSync(appPath)) {
+              resourcePath = appPath;
+            }
           }
         }
       }
