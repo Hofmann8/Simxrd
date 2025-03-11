@@ -302,7 +302,7 @@ const XRDForm = ({ onSubmit, suggestions }) => {
                 <p>您选择了特殊的晶化时间 <strong>{presetToApply.time}小时</strong>，系统将自动设置以下参数：</p>
                 <ul className="list-group mb-3">
                   <li className="list-group-item d-flex justify-content-between align-items-center">
-                    SiO₂/Na₂O
+                    SiO₂/Al₂O₃
                     <span className="badge bg-primary rounded-pill">{presetToApply.sio2}</span>
                   </li>
                   <li className="list-group-item d-flex justify-content-between align-items-center">

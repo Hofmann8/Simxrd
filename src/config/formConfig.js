@@ -2,12 +2,12 @@ import { FaFlask, FaThermometerHalf, FaClock } from 'react-icons/fa';
 
 export const formFields = {
   sio2: {
-    label: 'SiO₂/Na₂O',
+    label: 'SiO₂/Al₂O₃',
     icon: <FaFlask />,
     min: 2.0,
     max: 10.0,
     step: 0.1,
-    tooltip: 'SiO₂/Na₂O 比值范围：2.0-10.0',
+    tooltip: 'SiO₂/Al₂O₃ 比值范围：2.0-10.0',
     commonRange: { min: 3.0, max: 6.0 },
     specialValues: [
       { value: 3.0, label: 'A型' },
@@ -104,9 +104,9 @@ export const specialTimePresets = [
 // 添加其他参数的特殊预设
 export const specialPresets = {
   sio2: {
-    3.0: { description: '标准SiO₂/Na₂O比值，适合合成A型沸石' },
-    5.0: { description: 'FAU型沸石的最佳SiO₂/Na₂O比值' },
-    7.0: { description: 'SOD型沸石的最佳SiO₂/Na₂O比值' }
+    3.0: { description: '标准SiO₂/Al₂O₃比值，适合合成A型沸石' },
+    5.0: { description: 'FAU型沸石的最佳SiO₂/Al₂O₃比值' },
+    7.0: { description: 'SOD型沸石的最佳SiO₂/Al₂O₃比值' }
   },
   na2o: {
     2.0: { description: '标准Na₂O/Al₂O₃比值，适合大多数沸石合成' },

@@ -129,7 +129,7 @@ const SimXRD = () => {
                   <div className="mt-4">
                     <h6 className="text-primary mb-3">参数说明</h6>
                     <div className="small text-muted">
-                      <p className="mb-2">• SiO₂/Na₂O 比例：影响沸石的骨架结构，建议范围 3-6</p>
+                      <p className="mb-2">• SiO₂/Al₂O₃ 比例：影响沸石的骨架结构，建议范围 3-6</p>
                       <p className="mb-2">• Na₂O/Al₂O₃ 比例：影响结晶度，建议范围 2-6</p>
                       <p className="mb-2">• H₂O/Na₂O 比例：影响晶化速率，建议范围 8-15</p>
                       <p className="mb-2">• 时间：晶化时间，建议范围 2-24小时</p>

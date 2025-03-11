@@ -1,6 +1,6 @@
 {
   "name": "simxrd",
-  "version": "0.9.2-beta",
+  "version": "0.9.3-beta",
   "description": "X射线衍射模拟工具",
   "author": "Lin Kai <Alexphant@mail.dlut.edu.cn>",
   "license": "MIT",

@@ -29,7 +29,7 @@ const About = () => {
                       <h4 className="text-primary mb-3">版本信息</h4>
                       <div className="card bg-light">
                         <div className="card-body">
-                          <h5 className="card-title">SimXRD v0.9.2 Beta</h5>
+                          <h5 className="card-title">SimXRD v0.9.3 Beta</h5>
                           <p className="card-text text-muted">最后更新: 2025年3月</p>
                           <div className="d-flex align-items-center mt-3">
                             <span className="badge bg-info me-2">测试版</span>
